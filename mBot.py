@@ -24,7 +24,7 @@ for i in range(len(s)):
 		if(k==e[i]):
 			d[e[i]].append(t[j][1]);
 
-size=6;
+size=8;
 d0={};
 for i in range(len(s)):
 	for p in range(size):
@@ -33,3 +33,23 @@ for i in range(len(s)):
 			if(k==t[i][p]):
 				d0[t[i][p]].append(t[i][j+1]);
 
+
+
+
+f0=e[r.randint(0,len(s)-1)];#first word
+f1=d[f0][r.randint(0,len(d[f0])-1)]#second word
+f2=d0[f1][r.randint(0,len(d0[f1])-1)]#anything after can follow this
+output=f0+" "+f1+" "+f2;
+print(output);
+op=f2;
+outLen=4;
+for x in range(outLen):
+	try:
+		on=d0[op][r.randint(0,len(d0[op])-1)]#output new
+		op=on;#output previous
+		output=output+" "+ op;
+		if(x==outLen-1):
+			output=output+".";
+	except:
+		output=output+".";	
+print(output);
