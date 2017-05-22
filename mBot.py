@@ -5,6 +5,7 @@
 #
 import tweepy as t
 import collections
+import random as r
 
 f=open('data.txt');
 s=f.readlines();
@@ -22,3 +23,13 @@ for i in range(len(s)):
 	for j,k in enumerate(e):
 		if(k==e[i]):
 			d[e[i]].append(t[j][1]);
+
+size=6;
+d0={};
+for i in range(len(s)):
+	for p in range(size):
+		d0[t[i][p]]=[]
+		for j,k in enumerate(t[i]):
+			if(k==t[i][p]):
+				d0[t[i][p]].append(t[i][j+1]);
+
