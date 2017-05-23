@@ -27,10 +27,10 @@ for i in range(len(s)):
 size=10;
 d0={};
 for i in range(len(s)):
-	for p in range(size):
+	for p in range(len(t[i])):
 		d0[t[i][p]]=[]
 		for j,k in enumerate(t[i]):
-			if(k==t[i][p]):
+			if((k==t[i][p])and(j!=len(t[i])-1)):
 				d0[t[i][p]].append(t[i][j+1]);
 
 
