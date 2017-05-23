@@ -24,7 +24,7 @@ for i in range(len(s)):
 		if(k==e[i]):
 			d[e[i]].append(t[j][1]);
 
-size=8;
+size=10;
 d0={};
 for i in range(len(s)):
 	for p in range(size):
@@ -40,9 +40,8 @@ f0=e[r.randint(0,len(s)-1)];#first word
 f1=d[f0][r.randint(0,len(d[f0])-1)]#second word
 f2=d0[f1][r.randint(0,len(d0[f1])-1)]#anything after can follow this
 output=f0+" "+f1+" "+f2;
-print(output);
 op=f2;
-outLen=10;
+outLen=r.randint(5,10);
 for x in range(outLen):
 	try:
 		on=d0[op][r.randint(0,len(d0[op])-1)]#output new
