@@ -3,9 +3,51 @@
 #
 #	
 #
-import tweepy as t
+import tweepy
 import collections
 import random as r
+import string
+#----------------------------
+#	Tweepy stuff
+#----------------------------
+def postTweet(s,info):
+	auth = tweepy.OAuthHandler(info['ck'], info['cs'])
+	auth.set_access_token(info['at'], info['ats'])
+	api = tweepy.API(auth)
+	statusmsg=(s);
+	try:
+		api.update_status(status=statusmsg);
+		print('Tweet Successful')
+	except Exception:
+		#Stops everything crashing if there is a connection issue.
+		print('Tweet Unsuccessful');
+
+def tweepyInit():
+	print("Initialising Tweepy...");
+	tokens=open('tokens.txt');
+	info={
+	'ck':"",
+	'cs':"",
+	'at':"",
+	'ats':""
+	}
+	consumer_key=tokens.readline();
+	consumer_secret=tokens.readline();
+	access_token=tokens.readline();
+	access_token_secret=tokens.readline();
+	tokens.close();
+	#Remove the NewLineCharacter;
+	info['ck']=consumer_key[:-1];
+	info['cs']=consumer_secret[:-1];
+	info['at']=access_token[:-1];
+	info['ats']=access_token_secret[:-1];
+	print("Complete!");
+	return info;
+#----------------------------
+
+tweepInfo=tweepyInit();
+
+
 
 f=open('data.txt');
 s=f.readlines();
@@ -21,7 +63,7 @@ for i in range(len(s)):
 	#d[e[i]]=[t[i][1]];
 	d[e[i]]=[]
 	for j,k in enumerate(e):
-		if(k==e[i]):
+		if(k==e[i]):Z
 			d[e[i]].append(t[j][1]);
 
 size=10;
@@ -52,9 +94,10 @@ while end!=True:
 		op=on;#output previous
 		output=output+" "+ op;
 		if(len(d0[op])==0):
-			output=output+".";
+			#output=output+".";
 			end=True;
 	except:
-		output=output+".";	
+	#	output=output+".";	
 		break;
 print(output);	
+postTweet(output,tweepInfo);
