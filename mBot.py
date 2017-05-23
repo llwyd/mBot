@@ -42,14 +42,19 @@ f2=d0[f1][r.randint(0,len(d0[f1])-1)]#anything after can follow this
 output=f0+" "+f1+" "+f2;
 op=f2;
 outLen=r.randint(5,10);
-for x in range(outLen):
+
+end=False;
+
+
+while end!=True:
 	try:
 		on=d0[op][r.randint(0,len(d0[op])-1)]#output new
 		op=on;#output previous
 		output=output+" "+ op;
-		if(x==outLen-1):
+		if(len(d0[op])==0):
 			output=output+".";
+			end=True;
 	except:
 		output=output+".";	
 		break;
-print(output);
+print(output);	
