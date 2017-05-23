@@ -7,6 +7,9 @@ import tweepy
 import collections
 import random as r
 import string
+
+
+
 #----------------------------
 #	Tweepy stuff
 #----------------------------
@@ -63,7 +66,7 @@ for i in range(len(s)):
 	#d[e[i]]=[t[i][1]];
 	d[e[i]]=[]
 	for j,k in enumerate(e):
-		if(k==e[i]):Z
+		if(k==e[i]):
 			d[e[i]].append(t[j][1]);
 
 size=10;
