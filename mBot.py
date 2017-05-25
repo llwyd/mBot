@@ -35,6 +35,7 @@ def post_tweet(statusmsg, info):
 def get_tweets(user,num):
     tweets = api.user_timeline(id=user, count=num)
     messages = []
+    count=0;
     for tweet in tweets:
 
         text = get_full_tweet(tweet.id)
@@ -45,7 +46,8 @@ def get_tweets(user,num):
         elif t[0]=="RT":
         	continue
         messages.append(text)
-        print(text)
+        count+=1;
+        print(count,end="");
     return messages
 
 
@@ -83,7 +85,7 @@ api = get_api(tweepyInfo)
 # f = open('data.txt')
 # s = f.readlines()
 # f.close()
-numTweet=50;#number of tweets to read
+numTweet=100;#number of tweets to read
 follow = open('follow.txt')
 s = get_tweets(follow.readline(),numTweet)
 follow.close()
@@ -106,7 +108,7 @@ for i in range(len(s)):
     # d[e[i]]=[t[i][1]];
     d[e[i]] = []
     for j, k in enumerate(e):
-        if k == e[i]:
+        if ((k == e[i])and(len(t[j])>1)):
             d[e[i]].append(t[j][1])
 
 size = 10
