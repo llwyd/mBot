@@ -94,7 +94,10 @@ t = []
 splitText=[]
 for i in range(len(s)):
 	splitText=s[i].split();
-	t.append(splitText[:-1])
+	if(splitText[-1][0:5]=="https"):
+		t.append(splitText[:-1])
+	else:
+		t.append(splitText)
 	e.append(t[i][0])
 
 # this loop works out which words are duplicate so it can begin the p structure
