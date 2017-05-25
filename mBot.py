@@ -32,17 +32,20 @@ def post_tweet(statusmsg, info):
         print('Tweet Unsuccessful')
 
 
-def get_tweets(user):
-    tweets = api.user_timeline(id=user, count=20)
+def get_tweets(user,num):
+    tweets = api.user_timeline(id=user, count=num)
     messages = []
     for tweet in tweets:
 
         text = get_full_tweet(tweet.id)
-        print(text)
+        t=text.split();
+        #print(text)
         if len(text.split()) <= 1:
             continue
+        elif t[0]=="RT":
+        	continue
         messages.append(text)
-
+        print(text)
     return messages
 
 
@@ -80,8 +83,9 @@ api = get_api(tweepyInfo)
 # f = open('data.txt')
 # s = f.readlines()
 # f.close()
+numTweet=50;#number of tweets to read
 follow = open('follow.txt')
-s = get_tweets(follow.readline())
+s = get_tweets(follow.readline(),numTweet)
 follow.close()
 time.sleep(1)
 
