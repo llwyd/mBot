@@ -36,6 +36,7 @@ def post_tweet(statusmsg, info):
 def get_tweets(user, num):
     tweets = api.user_timeline(id=user, count=num)
     messages = {}
+    count = 0
     for tweet in tweets:
 
         text = tweet._json['text']
@@ -43,11 +44,12 @@ def get_tweets(user, num):
             text = get_full_tweet(tweet.id)
 
         #  we don't want 1 word tweets or retweets
-        if len(text.split()) <= 1 or text.split()[0] == "RT":
+        if len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
             continue
 
-        print(text)
         messages[tweet.id] = text
+        count += 1
+        print(text)
 
     return messages
 
@@ -109,7 +111,7 @@ for i in range(len(s)):
     # d[e[i]]=[t[i][1]];
     d[e[i]] = []
     for j, k in enumerate(e):
-        if k == e[i]:
+        if (k == e[i]) and (len(t[j]) > 1):
             d[e[i]].append(t[j][1])
 
 size = 10
