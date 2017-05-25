@@ -45,9 +45,12 @@ def get_tweets(user,num):
             continue
         elif t[0]=="RT":
         	continue
+        elif text[0]=="@":
+        	continue
         messages.append(text)
         count+=1;
-        print(count,end="");
+        print(text)
+        #print(count,end="");
     return messages
 
 
