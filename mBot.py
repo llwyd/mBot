@@ -32,25 +32,28 @@ def post_tweet(statusmsg, info):
         print('Tweet Unsuccessful')
 
 
-def get_tweets(user,num):
+#  get tweets as a map of <id, message>
+def get_tweets(user, num):
     tweets = api.user_timeline(id=user, count=num)
-    messages = []
+    messages = {}
     for tweet in tweets:
 
-        text = get_full_tweet(tweet.id)
-        t=text.split();
-        #print(text)
-        if len(text.split()) <= 1:
+        text = tweet._json['text']
+        if '…' in text:
+            text = get_full_tweet(tweet.id)
+
+        #  we don't want 1 word tweets or retweets
+        if len(text.split()) <= 1 or text.split()[0] == "RT":
             continue
-        elif t[0]=="RT":
-        	continue
-        messages.append(text)
+
         print(text)
+        messages[tweet.id] = text
+
     return messages
 
 
-def get_full_tweet(id):
-    return api.get_status(id, tweet_mode='extended')._json['full_text']
+def get_full_tweet(tweet_id):
+    return api.get_status(tweet_id, tweet_mode='extended')._json['full_text']
 
 
 def tweepy_init():
@@ -83,22 +86,22 @@ api = get_api(tweepyInfo)
 # f = open('data.txt')
 # s = f.readlines()
 # f.close()
-numTweet=50;#number of tweets to read
+numTweet = 100  # number of tweets to read
 follow = open('follow.txt')
-s = get_tweets(follow.readline(),numTweet)
+s = list(get_tweets(follow.readline(), numTweet).values())
 follow.close()
 time.sleep(1)
 
 e = []
 t = []
-splitText=[]
+
 for i in range(len(s)):
-	splitText=s[i].split();
-	if(splitText[-1][0:5]=="https"):
-		t.append(splitText[:-1])
-	else:
-		t.append(splitText)
-	e.append(t[i][0])
+    splitText = s[i].split()
+    if splitText[-1][0:5] == "https":
+        t.append(splitText[:-1])
+    else:
+        t.append(splitText)
+    e.append(t[i][0])
 
 # this loop works out which words are duplicate so it can begin the p structure
 d = {}  # define dictionary, this will hold each word and the location
@@ -140,4 +143,4 @@ while not end:
         break
 
 print("\n\n" + output)
-#post_tweet(output, tweepyInfo)
+#  post_tweet(output, tweepyInfo)
