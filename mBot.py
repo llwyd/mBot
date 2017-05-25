@@ -91,9 +91,11 @@ time.sleep(1)
 
 e = []
 t = []
+splitText=[]
 for i in range(len(s)):
-    t.append(s[i].split())  # first word from the database
-    e.append(t[i][0])  # append it to array of first words
+	splitText=s[i].split();
+	t.append(splitText[:-1])
+	e.append(t[i][0])
 
 # this loop works out which words are duplicate so it can begin the p structure
 d = {}  # define dictionary, this will hold each word and the location
