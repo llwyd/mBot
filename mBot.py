@@ -45,7 +45,7 @@ def get_tweets(user, num):
 
         messages[tweet.id] = text
         count += 1
-        print(text)
+        #print(text)
 
     return messages
 
@@ -77,52 +77,66 @@ def tweepy_init():
     return info
 
 # ----------------------------
+#   Markov Stuff
+# ----------------------------
+def firstWord(s):
+	e=[]
+	t=[]
+	for i in range(len(s)):
+	    splitText = s[i].split()
+	    if splitText[-1][0:5] == "https":
+	        t.append(splitText[:-1])
+	    else:
+	        t.append(splitText)
+	    e.append(t[i][0])
+	return e,t
+# this loop works out which words are duplicate so it can begin the p structure
+def secondWord(s,e,t):
+	d={}
+	for i in range(len(s)): 
+	    d[e[i]] = []
+	    for j, k in enumerate(e):
+	        if (k == e[i]) and (len(t[j]) > 1):
+	            d[e[i]].append(t[j][1])
+	return d;
+def otherWord(s,e,t):
+	d0 = {}
+	for i in range(len(s)):
+	    for p in range(len(t[i])):
+	        d0[t[i][p]] = []
+	        for j, k in enumerate(t[i]):
+	            if (k == t[i][p]) and (j != len(t[i]) - 1):
+	                d0[t[i][p]].append(t[i][j + 1])
+	return d0;
 
 tweepyInfo = tweepy_init()
 api = get_api(tweepyInfo)
 
-# f = open('data.txt')
-# s = f.readlines()
-# f.close()
-numTweet = 100  # number of tweets to read
+
+#Parameters
+numTweet = 200  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
-follow = open('follow.txt')
-s = list(get_tweets(follow.readline(), numTweet).values())
-follow.close()
-time.sleep(1)
-
-e = []
-t = []
-
-for i in range(len(s)):
-    splitText = s[i].split()
-    if splitText[-1][0:5] == "https":
-        t.append(splitText[:-1])
-    else:
-        t.append(splitText)
-    e.append(t[i][0])
-
-# this loop works out which words are duplicate so it can begin the p structure
-d = {}  # define dictionary, this will hold each word and the location
-for i in range(len(s)):
-    # d[e[i]]=[t[i][1]];
-    d[e[i]] = []
-    for j, k in enumerate(e):
-        if (k == e[i]) and (len(t[j]) > 1):
-            d[e[i]].append(t[j][1])
-
-size = 10
-d0 = {}
-for i in range(len(s)):
-    for p in range(len(t[i])):
-        d0[t[i][p]] = []
-        for j, k in enumerate(t[i]):
-            if (k == t[i][p]) and (j != len(t[i]) - 1):
-                d0[t[i][p]].append(t[i][j + 1])
-
 
 delay = 5 #in seconds
+e = [] #key, array of first values
+t = [] 
+d = {}  # define dictionary, this will hold each word and the location
+d0 = {}
+
 while True:
+	print("-----------------------------------------",flush=True)
+	follow = open('follow.txt')
+	print("Retrieving timeline...",end="",flush=True)
+	s = list(get_tweets(follow.readline(), numTweet).values())
+	print("Complete!",flush=True)
+	follow.close()
+	time.sleep(1)
+	print("Calculating markov chain...",end="",flush=True)
+	e,t=firstWord(s);
+	d=secondWord(s,e,t);
+	d0=otherWord(s,e,t);
+	print("Complete!",flush=True)
+	print("Building output...",end="",flush=True)
 	f0 = e[r.randint(0, len(s) - 1)]  # first word
 	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
 	f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
@@ -140,6 +154,14 @@ while True:
 	    except:
 	        #	output=output+".";
 	        break
-	print("\n\n" + output)
+	print("Complete!\n",flush=True)
+	print("*****************************************",flush=True)
+	print("\n" + output+"\n",flush=True);
+	print("*****************************************",flush=True)
 	time.sleep(delay);
+	e.clear();
+	t.clear();
+	d.clear();
+	s.clear();
+	d0.clear();
 	#  post_tweet(output, tweepyInfo)
