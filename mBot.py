@@ -18,8 +18,6 @@ def get_api(info):
     auth = tweepy.OAuthHandler(info['ck'], info['cs'])
     auth.set_access_token(info['at'], info['ats'])
     return tweepy.API(auth)
-
-
 def post_tweet(statusmsg, info):
     auth = tweepy.OAuthHandler(info['ck'], info['cs'])
     auth.set_access_token(info['at'], info['ats'])
@@ -30,8 +28,6 @@ def post_tweet(statusmsg, info):
     except Exception:
         # Stops everything crashing if there is a connection issue.
         print('Tweet Unsuccessful')
-
-
 #  get tweets as a map of <id, message>
 def get_tweets(user, num):
     tweets = api.user_timeline(id=user, count=num)
@@ -89,6 +85,7 @@ api = get_api(tweepyInfo)
 # s = f.readlines()
 # f.close()
 numTweet = 100  # number of tweets to read
+buffSize = 1000 # size of overall storage buffer
 follow = open('follow.txt')
 s = list(get_tweets(follow.readline(), numTweet).values())
 follow.close()
@@ -123,26 +120,26 @@ for i in range(len(s)):
             if (k == t[i][p]) and (j != len(t[i]) - 1):
                 d0[t[i][p]].append(t[i][j + 1])
 
-f0 = e[r.randint(0, len(s) - 1)]  # first word
-f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
-f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
-output = f0 + " " + f1 + " " + f2
-op = f2
-outLen = r.randint(5, 10)
 
-end = False
-
-while not end:
-    try:
-        on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
-        op = on  # output previous
-        output = output + " " + op
-        if len(d0[op]) == 0:
-            # output=output+".";
-            end = True
-    except:
-        #	output=output+".";
-        break
-
-print("\n\n" + output)
-#  post_tweet(output, tweepyInfo)
+delay = 5 #in seconds
+while True:
+	f0 = e[r.randint(0, len(s) - 1)]  # first word
+	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
+	f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
+	output = f0 + " " + f1 + " " + f2
+	op = f2
+	end = False
+	while not end:
+	    try:
+	        on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
+	        op = on  # output previous
+	        output = output + " " + op
+	        if len(d0[op]) == 0:
+	            # output=output+".";
+	            end = True
+	    except:
+	        #	output=output+".";
+	        break
+	print("\n\n" + output)
+	time.sleep(delay);
+	#  post_tweet(output, tweepyInfo)
