@@ -30,7 +30,8 @@ def post_tweet(statusmsg, info):
         print('Tweet Unsuccessful')
 #  get tweets as a map of <id, message>
 def get_tweets(user, num):
-    tweets = api.user_timeline(id=user, count=num)
+    #tweets = api.user_timeline(id=user, count=num)
+    tweets=api.home_timeline(count=num);
     messages = {}
     count = 0
     for tweet in tweets:
@@ -45,7 +46,7 @@ def get_tweets(user, num):
 
         messages[tweet.id] = text
         count += 1
-        #print(text)
+        print(text)
 
     return messages
 
@@ -114,7 +115,7 @@ api = get_api(tweepyInfo)
 
 
 #Parameters
-numTweet = 200  # number of tweets to read
+numTweet = 500  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
 
 delay = 5 #in seconds
