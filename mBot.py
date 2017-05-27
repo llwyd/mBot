@@ -125,44 +125,47 @@ d = {}  # define dictionary, this will hold each word and the location
 d0 = {}
 
 while True:
-	print("-----------------------------------------",flush=True)
-	follow = open('follow.txt')
-	print("Retrieving timeline...",end="",flush=True)
-	s = list(get_tweets(follow.readline(), numTweet).values())
-	print("Complete!",flush=True)
-	follow.close()
-	time.sleep(1)
-	print("Calculating markov chain...",end="",flush=True)
-	e,t=firstWord(s);
-	d=secondWord(s,e,t);
-	d0=otherWord(s,e,t);
-	print("Complete!",flush=True)
-	print("Building output...",end="",flush=True)
-	f0 = e[r.randint(0, len(s) - 1)]  # first word
-	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
-	f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
-	output = f0 + " " + f1 + " " + f2
-	op = f2
-	end = False
-	while not end:
-	    try:
-	        on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
-	        op = on  # output previous
-	        output = output + " " + op
-	        if len(d0[op]) == 0:
-	            # output=output+".";
-	            end = True
-	    except:
-	        #	output=output+".";
-	        break
-	print("Complete!\n",flush=True)
-	print("*****************************************",flush=True)
-	print("\n" + output+"\n",flush=True);
-	print("*****************************************",flush=True)
-	e.clear();
-	t.clear();
-	d.clear();
-	s.clear();
-	d0.clear();
-	post_tweet(output, tweepyInfo)
+	try:
+		print("-----------------------------------------",flush=True)
+		follow = open('follow.txt')
+		print("Retrieving timeline...",end="",flush=True)
+		s = list(get_tweets(follow.readline(), numTweet).values())
+		print("Complete!",flush=True)
+		follow.close()
+		time.sleep(1)
+		print("Calculating markov chain...",end="",flush=True)
+		e,t=firstWord(s);
+		d=secondWord(s,e,t);
+		d0=otherWord(s,e,t);
+		print("Complete!",flush=True)
+		print("Building output...",end="",flush=True)
+		f0 = e[r.randint(0, len(s) - 1)]  # first word
+		f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
+		f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
+		output = f0 + " " + f1 + " " + f2
+		op = f2
+		end = False
+		while not end:
+		    try:
+		        on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
+		        op = on  # output previous
+		        output = output + " " + op
+		        if len(d0[op]) == 0:
+		            # output=output+".";
+		            end = True
+		    except:
+		        #	output=output+".";
+		        break
+		print("Complete!\n",flush=True)
+		print("*****************************************",flush=True)
+		print("\n" + output+"\n",flush=True);
+		print("*****************************************",flush=True)
+		e.clear();
+		t.clear();
+		d.clear();
+		s.clear();
+		d0.clear();
+		post_tweet(output, tweepyInfo)
+	except:
+		print("Algorithm Error, Retrying in 5 minutes.");
 	time.sleep(delay);
