@@ -46,7 +46,7 @@ def get_tweets(user, num):
 
         messages[tweet.id] = text
         count += 1
-        print(text)
+        #print(text)
 
     return messages
 
@@ -115,10 +115,10 @@ api = get_api(tweepyInfo)
 
 
 #Parameters
-numTweet = 500  # number of tweets to read
+numTweet = 250  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
 
-delay = 5 #in seconds
+delay = 60*5 #in seconds
 e = [] #key, array of first values
 t = [] 
 d = {}  # define dictionary, this will hold each word and the location
@@ -159,10 +159,10 @@ while True:
 	print("*****************************************",flush=True)
 	print("\n" + output+"\n",flush=True);
 	print("*****************************************",flush=True)
-	time.sleep(delay);
 	e.clear();
 	t.clear();
 	d.clear();
 	s.clear();
 	d0.clear();
-	#  post_tweet(output, tweepyInfo)
+	post_tweet(output, tweepyInfo)
+	time.sleep(delay);
