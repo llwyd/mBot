@@ -76,7 +76,23 @@ def tweepy_init():
     info['ats'] = access_token_secret[:-1]
     print("Complete!")
     return info
-
+# ----------------------------
+#   Text Filtering
+# ----------------------------
+#Filter tweets with particular keywords
+def filterWord(t,keyword):
+	for i in range(len(t)):
+		for j in range(len(t[i])):
+			if(t[i][j]==keyword):
+				return True;
+	return False;
+#Filter tweets with mentions
+def filterMentions(t):
+	for i in range(len(t)):
+		for j in range(len(t[i])):
+			if(t[i][j][0]=='@'):
+				return True;
+	return False;
 # ----------------------------
 #   Markov Stuff
 # ----------------------------
@@ -85,11 +101,12 @@ def firstWord(s):
 	t=[]
 	for i in range(len(s)):
 	    splitText = s[i].split()
-	    if splitText[-1][0:5] == "https":
-	        t.append(splitText[:-1])
-	    else:
-	        t.append(splitText)
-	    e.append(t[i][0])
+	    if(filterMentions(splitText)==False):
+		    if splitText[-1][0:5] == "https":
+		        t.append(splitText[:-1])
+		    else:
+		        t.append(splitText)
+		    e.append(t[i][0])
 	return e,t
 # this loop works out which words are duplicate so it can begin the p structure
 def secondWord(s,e,t):
@@ -109,6 +126,7 @@ def otherWord(s,e,t):
 	            if (k == t[i][p]) and (j != len(t[i]) - 1):
 	                d0[t[i][p]].append(t[i][j + 1])
 	return d0;
+
 
 tweepyInfo = tweepy_init()
 api = get_api(tweepyInfo)
@@ -165,11 +183,11 @@ while True:
 	print("*****************************************",flush=True)
 	print("\n" + output+"\n",flush=True);
 	print("*****************************************",flush=True)
-	e.clear();
-	t.clear();
-	d.clear();
-	s.clear();
-	d0.clear();
+	#e.clear();
+	#t.clear();
+	#d.clear();
+	#s.clear();
+	#d0.clear();
 		#post_tweet(output, tweepyInfo)
 	#except:
 	#	print("Algorithm Error, Retrying in 5 minutes.");
