@@ -8,8 +8,23 @@ import collections
 import random as r
 import string
 import time
-
-
+# ----------------------------
+#   Text Filtering
+# ----------------------------
+#Filter tweets with particular keywords
+def filterWord(t,keyword):
+	for i in range(len(t)):
+		for j in range(len(t[i])):
+			if(t[i][j]==keyword):
+				return True;
+	return False;
+#Filter tweets with mentions and hashtags
+def filterPrefix(t,prefix):
+	for i in range(len(t)):
+		for j in range(len(t[i])):
+			if(t[i][j][0]==prefix):
+				return True;
+	return False;
 # ----------------------------
 #   Tweepy stuff
 # ----------------------------
@@ -41,7 +56,7 @@ def get_tweets(user, num):
             text = get_full_tweet(tweet.id)
 
         #  we don't want 1 word tweets or retweets
-        if len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
+        if (filterPrefix(text.split(),'#')==True) or(filterPrefix(text.split(),'@')==True) or len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
             continue
 
         messages[tweet.id] = text
@@ -77,23 +92,6 @@ def tweepy_init():
     print("Complete!")
     return info
 # ----------------------------
-#   Text Filtering
-# ----------------------------
-#Filter tweets with particular keywords
-def filterWord(t,keyword):
-	for i in range(len(t)):
-		for j in range(len(t[i])):
-			if(t[i][j]==keyword):
-				return True;
-	return False;
-#Filter tweets with mentions
-def filterMentions(t):
-	for i in range(len(t)):
-		for j in range(len(t[i])):
-			if(t[i][j][0]=='@'):
-				return True;
-	return False;
-# ----------------------------
 #   Markov Stuff
 # ----------------------------
 def firstWord(s):
@@ -101,12 +99,11 @@ def firstWord(s):
 	t=[]
 	for i in range(len(s)):
 	    splitText = s[i].split()
-	    if(filterMentions(splitText)==False):
-		    if splitText[-1][0:5] == "https":
-		        t.append(splitText[:-1])
-		    else:
-		        t.append(splitText)
-		    e.append(t[i][0])
+	    if splitText[-1][0:5] == "https":
+	        t.append(splitText[:-1])
+	    else:
+	        t.append(splitText)
+	    e.append(t[i][0])
 	return e,t
 # this loop works out which words are duplicate so it can begin the p structure
 def secondWord(s,e,t):
@@ -133,7 +130,7 @@ api = get_api(tweepyInfo)
 
 
 #Parameters
-numTweet = 20  # number of tweets to read
+numTweet = 75  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
 
 delay = 4 #in seconds
@@ -160,7 +157,7 @@ while True:
 	rFlag=True;#flag to check for repeat
 	while rFlag==True:
 		f0 = e[r.randint(0, len(s) - 1)]  # first word
-		if(f0!=pf0):
+		if(f0!=pf0 and (len(d[f0])>0)):
 			rFlag=False;
 	pf0=f0;#Store first word into variable so it can avoid repeats
 	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
@@ -179,6 +176,9 @@ while True:
 	    except:
 	        #	output=output+".";
 	        break
+	#Add a full stop to the end if necessary.
+	if(output[len(output)-1]!='.'):
+		output=output+"."
 	print("Complete!\n",flush=True)
 	print("*****************************************",flush=True)
 	print("\n" + output+"\n",flush=True);
