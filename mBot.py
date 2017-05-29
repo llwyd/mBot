@@ -130,8 +130,12 @@ api = get_api(tweepyInfo)
 
 
 #Parameters
-numTweet = 75  # number of tweets to read
+numTweet = 200  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
+buffPos=0 #current position of buffer
+
+master=[None]*buffSize;
+match=False;
 
 delay = 4 #in seconds
 e = [] #key, array of first values
@@ -145,6 +149,16 @@ while True:
 	follow = open('follow.txt')
 	print("Retrieving timeline...",end="",flush=True)
 	s = list(get_tweets(follow.readline(), numTweet).values())
+	for i in range(len(s)):
+		for j in range(len(master)):
+			if(s[i]==master[j]):
+				match=True;
+				break;
+		if(match==False):
+			master[buffPos]=s[i];
+			buffPos+=1;
+			buffPos%=buffSize;
+
 	print("Complete!",flush=True)
 	follow.close()
 	time.sleep(1)
