@@ -150,6 +150,7 @@ while True:
 	print("Retrieving timeline...",end="",flush=True)
 	s = list(get_tweets(follow.readline(), numTweet).values())
 	for i in range(len(s)):
+		match=False;
 		for j in range(len(master)):
 			if(s[i]==master[j]):
 				match=True;
