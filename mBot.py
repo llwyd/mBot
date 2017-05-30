@@ -8,6 +8,7 @@ import collections
 import random as r
 import string
 import time
+from tqdm import tqdm
 # ----------------------------
 #   Text Filtering
 # ----------------------------
@@ -49,7 +50,7 @@ def get_tweets(user, num):
     tweets=api.home_timeline(count=num);
     messages = {}
     count = 0
-    for tweet in tweets:
+    for tweet in tqdm(tweets):
 
         text = tweet._json['text']
         if '…' in text:
@@ -160,7 +161,6 @@ while True:
 			buffPos+=1;
 			buffPos%=buffSize;
 
-	print("Complete!",flush=True)
 	follow.close()
 	time.sleep(1)
 	print("Calculating markov chain...",end="",flush=True)
