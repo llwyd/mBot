@@ -56,7 +56,7 @@ def get_tweets(num):
             text = get_full_tweet(tweet.id)
 
         #  we don't want 1 word tweets or retweets
-        if (filterPrefix(text.split(),'&')==True) or (filterPrefix(text.split(),'#')==True) or(filterPrefix(text.split(),'@')==True) or len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
+        if (filterPrefix(text.split(),'&')==True) or (filterPrefix(text.split(),'@')==True) or len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
             continue
 
         messages[tweet.id] = text
@@ -166,14 +166,14 @@ while True:
 			buffPos%=buffSize;
 	time.sleep(1)
 	print("Calculating markov chain...",end="",flush=True)
-	e,t=firstWord(s);
-	d=secondWord(s,e,t);
-	d0=otherWord(s,e,t);
+	e,t=firstWord(master);
+	d=secondWord(master,e,t);
+	d0=otherWord(master,e,t);
 	print("Complete!",flush=True)
 	print("Building output...",end="",flush=True)
 	rFlag=True;#flag to check for repeat
 	while rFlag==True:
-		f0 = e[r.randint(0, len(s) - 1)]  # first word
+		f0 = e[r.randint(0, len(e) - 1)]  # first word
 		if(f0!=pf0 and (len(d[f0])>0)):
 			rFlag=False;
 	pf0=f0;#Store first word into variable so it can avoid repeats
