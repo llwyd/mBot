@@ -136,25 +136,28 @@ api = get_api(tweepyInfo)
 
 
 #Parameters
-numTweet = 100  # number of tweets to read
+numTweet = 250  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
 buffPos=0 #current position of buffer
 
 master=[None]*buffSize;
 match=False;
 
-delay = 4 #in seconds
+delay = 120 #in seconds
 e = [] #key, array of first values
 t = [] 
 d = {}  # define dictionary, this will hold each word and the location
 d0 = {}
 pf0=""
+#Filter for removing punctuation (except sentence endings)
+puncFilter=str.maketrans('','','\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~');
 while True:
 	#try:
 	print("-----------------------------------------",flush=True)
 	print("Retrieving timeline...",end="",flush=True)
 	s = list(get_tweets(numTweet).values())
 	for i in range(len(s)):
+		s[i]=s[i].translate(puncFilter);
 		match=False;
 		for j in range(len(master)):
 			if(s[i]==master[j]):
