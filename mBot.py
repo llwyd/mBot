@@ -45,8 +45,7 @@ def post_tweet(statusmsg, info):
         # Stops everything crashing if there is a connection issue.
         print('Tweet Unsuccessful')
 #  get tweets as a map of <id, message>
-def get_tweets(user, num):
-    #tweets = api.user_timeline(id=user, count=num)
+def get_tweets(num):
     tweets=api.home_timeline(count=num);
     messages = {}
     count = 0
@@ -57,7 +56,7 @@ def get_tweets(user, num):
             text = get_full_tweet(tweet.id)
 
         #  we don't want 1 word tweets or retweets
-        if (filterPrefix(text.split(),'#')==True) or(filterPrefix(text.split(),'@')==True) or len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
+        if (filterPrefix(text.split(),'&')==True) or (filterPrefix(text.split(),'#')==True) or(filterPrefix(text.split(),'@')==True) or len(text.split()) <= 1 or text.split()[0] == "RT" or text.split()[0] == "@":
             continue
 
         messages[tweet.id] = text
@@ -99,30 +98,36 @@ def firstWord(s):
 	e=[]
 	t=[]
 	for i in range(len(s)):
-	    splitText = s[i].split()
-	    if splitText[-1][0:5] == "https":
-	        t.append(splitText[:-1])
-	    else:
-	        t.append(splitText)
-	    e.append(t[i][0])
+		if(s[i]==None):
+			continue
+		splitText = s[i].split()
+		if splitText[-1][0:5] == "https":
+			t.append(splitText[:-1])
+		else:
+			t.append(splitText)
+		e.append(t[i][0])
 	return e,t
 # this loop works out which words are duplicate so it can begin the p structure
 def secondWord(s,e,t):
 	d={}
-	for i in range(len(s)): 
-	    d[e[i]] = []
-	    for j, k in enumerate(e):
-	        if (k == e[i]) and (len(t[j]) > 1):
-	            d[e[i]].append(t[j][1])
+	for i in range(len(s)):
+		if(s[i]==None):
+			continue; 
+		d[e[i]] = []
+		for j, k in enumerate(e):
+			if (k == e[i]) and (len(t[j]) > 1):
+				d[e[i]].append(t[j][1])
 	return d;
 def otherWord(s,e,t):
 	d0 = {}
 	for i in range(len(s)):
-	    for p in range(len(t[i])):
-	        d0[t[i][p]] = []
-	        for j, k in enumerate(t[i]):
-	            if (k == t[i][p]) and (j != len(t[i]) - 1):
-	                d0[t[i][p]].append(t[i][j + 1])
+		if(s[i]==None):
+			continue;
+		for p in range(len(t[i])):
+			d0[t[i][p]] = []
+			for j, k in enumerate(t[i]):
+				if (k == t[i][p]) and (j != len(t[i]) - 1):
+					d0[t[i][p]].append(t[i][j + 1])
 	return d0;
 
 
@@ -131,7 +136,7 @@ api = get_api(tweepyInfo)
 
 
 #Parameters
-numTweet = 200  # number of tweets to read
+numTweet = 100  # number of tweets to read
 buffSize = 1000 # size of overall storage buffer
 buffPos=0 #current position of buffer
 
@@ -147,9 +152,8 @@ pf0=""
 while True:
 	#try:
 	print("-----------------------------------------",flush=True)
-	follow = open('follow.txt')
 	print("Retrieving timeline...",end="",flush=True)
-	s = list(get_tweets(follow.readline(), numTweet).values())
+	s = list(get_tweets(numTweet).values())
 	for i in range(len(s)):
 		match=False;
 		for j in range(len(master)):
@@ -160,8 +164,6 @@ while True:
 			master[buffPos]=s[i];
 			buffPos+=1;
 			buffPos%=buffSize;
-
-	follow.close()
 	time.sleep(1)
 	print("Calculating markov chain...",end="",flush=True)
 	e,t=firstWord(s);
