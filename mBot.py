@@ -90,10 +90,10 @@ def filter_tweet(tid, text):
 
     split = text.split()
     is_filtered = filter_prefix(split, '&') \
-                  or filter_prefix(split, '@') \
-                  or len(split) <= 2 \
-                  or split[0] == "RT" \
-                  or split[0] == "@"
+        or filter_prefix(split, '@') \
+        or len(split) <= 2 \
+        or split[0] == "RT" \
+        or split[0] == "@"
 
     if is_filtered:
         tweet_store.remove(tid)
@@ -102,7 +102,6 @@ def filter_tweet(tid, text):
 
 
 def get_full_tweet(tweet_id):
-    # print("getting full text for : " + str(tweet_id))
     return api.get_status(tweet_id, tweet_mode='extended')._json['full_text']
 
 

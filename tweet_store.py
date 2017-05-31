@@ -11,14 +11,12 @@ def save(new_tweets, threshold):
     for new_tweet in new_tweets:
         tweets[new_tweet.id] = new_tweet.text
 
+    # re-sort the tweets such that the newest appears first in the dict
     tweets = collections.OrderedDict(sorted(tweets.items(), reverse=True))
 
     if num() >= threshold:
+        # prune the oldest tweets
         tweets = collections.OrderedDict(e for i, e in enumerate(tweets.items()) if 0 <= i <= threshold-1)
-
-
-def get_range(d, begin, end):
-    return
 
 
 def get(tid):
