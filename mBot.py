@@ -91,7 +91,7 @@ def filter_tweet(tid, text):
     split = text.split()
     is_filtered = filter_prefix(split, '&') \
                   or filter_prefix(split, '@') \
-                  or len(split) <= 1 \
+                  or len(split) <= 2 \
                   or split[0] == "RT" \
                   or split[0] == "@"
 
@@ -180,8 +180,8 @@ api = get_api(tweepyInfo)
 
 # Parameters
 
-# number of tweets to read
-numTweet = 250
+# number of tweets to read (capped at 200 by twitter)
+numTweet = 200
 # size of overall storage buffer
 buffSize = 1000
 # current position of buffer
@@ -190,7 +190,7 @@ buffPos = 0
 master = [None] * buffSize
 match = False
 
-delay = 10  # in seconds
+delay = 1800  # in seconds
 # key, array of first values
 e = []
 t = []

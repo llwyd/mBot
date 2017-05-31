@@ -13,8 +13,12 @@ def save(new_tweets, threshold):
 
     tweets = collections.OrderedDict(sorted(tweets.items(), reverse=True))
 
-    if len(tweets) >= threshold:
-        tweets = tweets[:threshold - 1]
+    if num() >= threshold:
+        tweets = collections.OrderedDict(e for i, e in enumerate(tweets.items()) if 0 <= i <= threshold-1)
+
+
+def get_range(d, begin, end):
+    return
 
 
 def get(tid):
