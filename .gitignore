@@ -5,3 +5,5 @@ follow.txt
 tweets.json
 
 .idea/
+__pycache__/
+
