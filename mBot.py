@@ -173,6 +173,36 @@ def other_word(s, e, t):
                     d0[t[i][p]].append(t[i][j + 1])
     return d0
 
+def buildWord(s,e,t):
+	pf0 = ""
+	print("Building output...", end="", flush=True)
+	rFlag = True  # flag to check for repeat
+	while rFlag:
+		f0 = e[r.randint(0, len(e) - 1)]  # first word
+		if f0 != pf0 and len(d[f0]) > 0:
+			rFlag = False
+	pf0 = f0  # Store first word into variable so it can avoid repeats
+	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
+	f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
+	output = f0 + " " + f1 + " " + f2
+	op = f2
+	end = False
+	while not end:
+		try:
+			on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
+			op = on  # output previous
+			output = output + " " + op
+			if len(d0[op]) == 0:
+				# output=output + "."
+				end = True
+		except:
+			# output=output + "."
+			break
+	# Add a full stop to the end if necessary.
+	if output[len(output) - 1] != '.':
+		output = output + "."
+	print("Complete!\n", flush=True)
+	return output;
 
 tweepyInfo = tweepy_init()
 api = get_api(tweepyInfo)
@@ -196,7 +226,7 @@ t = []
 # define dictionary, this will hold each word and the location
 d = {}
 d0 = {}
-pf0 = ""
+
 
 # Filter for removing punctuation (except sentence endings)
 puncFilter = str.maketrans('', '', '\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
@@ -226,36 +256,9 @@ while True:
     d0 = other_word(master, e, t)
     print("Complete!", flush=True)
 
-    print("Building output...", end="", flush=True)
-    rFlag = True  # flag to check for repeat
-    while rFlag:
-        f0 = e[r.randint(0, len(e) - 1)]  # first word
-        if f0 != pf0 and len(d[f0]) > 0:
-            rFlag = False
-
-    pf0 = f0  # Store first word into variable so it can avoid repeats
-    f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
-    f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
-    output = f0 + " " + f1 + " " + f2
-    op = f2
-    end = False
-    while not end:
-        try:
-            on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
-            op = on  # output previous
-            output = output + " " + op
-            if len(d0[op]) == 0:
-                # output=output + "."
-                end = True
-        except:
-            # output=output + "."
-            break
-
-    # Add a full stop to the end if necessary.
-    if output[len(output) - 1] != '.':
-        output = output + "."
-
-    print("Complete!\n", flush=True)
+    output=buildWord(master,e,t);
+    while len(output)>140:
+    	output=buildWord(master,e,t);
     print("*****************************************", flush=True)
     print("\n" + output + "\n", flush=True)
     print("*****************************************", flush=True)
