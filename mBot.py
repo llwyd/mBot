@@ -183,21 +183,22 @@ def buildWord(s,e,t):
 			rFlag = False
 	pf0 = f0  # Store first word into variable so it can avoid repeats
 	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
-	f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
-	output = f0 + " " + f1 + " " + f2
-	op = f2
-	end = False
-	while not end:
-		try:
-			on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
-			op = on  # output previous
-			output = output + " " + op
-			if len(d0[op]) == 0:
+	#f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
+	output = f0 + " " + f1
+	op = f1
+	if(len(d0[f1])>0):
+		end = False
+		while not end:
+			try:
+				on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
+				op = on  # output previous
+				output = output + " " + op
+				if len(d0[op]) == 0:
+					# output=output + "."
+					end = True
+			except:
 				# output=output + "."
-				end = True
-		except:
-			# output=output + "."
-			break
+				break
 	# Add a full stop to the end if necessary.
 	if output[len(output) - 1] != '.':
 		output = output + "."
