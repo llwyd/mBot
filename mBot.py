@@ -167,7 +167,8 @@ def other_word(s, e, t):
         if s[i] is None:
             continue
         for p in range(len(t[i])):
-            d0[t[i][p]] = []
+            if(not(t[i][p] in d0.keys())):
+                d0[t[i][p]] = []
             for j, k in enumerate(t[i]):
                 if k == t[i][p] and j != len(t[i]) - 1:
                     d0[t[i][p]].append(t[i][j + 1])
