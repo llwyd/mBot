@@ -10,6 +10,7 @@ import string
 import time
 import tweet_store
 from tqdm import tqdm
+import pyttsx3
 
 
 # ----------------------------
@@ -228,7 +229,9 @@ t = []
 # define dictionary, this will hold each word and the location
 d = {}
 d0 = {}
-
+#text to speak stuff
+speak = pyttsx3.init();
+speak.setProperty('rate',80);
 
 # Filter for removing punctuation (except sentence endings)
 puncFilter = str.maketrans('', '', '\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
@@ -263,7 +266,9 @@ while True:
     	output=buildWord(master,e,t);
     print("*****************************************", flush=True)
     print("\n" + output + "\n", flush=True)
+    speak.say(output);
     print("*****************************************", flush=True)
+    speak.runAndWait();
     # e.clear();
     # t.clear();
     # d.clear();
