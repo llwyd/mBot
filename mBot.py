@@ -137,15 +137,29 @@ def tweepy_init():
 def first_word(s):
     e = []
     t = []
+
     for i in range(len(s)):
+
         if s[i] is None:
             continue
-        splitText = s[i].split()
-        if splitText[-1][0:5] == "https":
-            t.append(splitText[:-1])
-        else:
-            t.append(splitText)
+
+        t.append(list(filter(lambda o: o[0:5] != "https", s[i].split())))
         e.append(t[i][0])
+
+        # left the old code here in case there is
+        # an issue with the new version, too tired
+        # to properly test it right now.
+        #
+        # good luck with the demo :)
+
+        #     splitText = s[i].split()
+        #     if splitText[-1][0:5] == "https":
+        #         t.append(splitText[:-1])
+        #     else:
+        #         t.append(splitText)
+        #     e.append(t[i][0])
+        # return e, t
+
     return e, t
 
 
