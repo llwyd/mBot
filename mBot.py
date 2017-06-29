@@ -4,13 +4,13 @@
 #
 #
 import tweepy
-import collections
 import random as r
-import string
 import time
+import re
 import tweet_store
 from tqdm import tqdm
 import pyttsx3
+from settings import config
 
 
 # ----------------------------
@@ -35,10 +35,25 @@ def filter_prefix(t, prefix):
 
 
 # ----------------------------
+#   text-to-speech
+# ----------------------------
+def init_tts():
+    if bool(config["textToSpeech"]["enabled"]):
+        speak = pyttsx3.init()
+        speak.setProperty('rate', int(config["textToSpeech"]["rate"]))
+        return speak
+    return None
+
+
+def say(text):
+    if bool(config["textToSpeech"]["enabled"]):
+        speak.say(text)
+        speak.runAndWait()
+
+
+# ----------------------------
 #   Tweepy stuff
 # ----------------------------
-
-
 def get_api(info):
     auth = tweepy.OAuthHandler(info['ck'], info['cs'])
     auth.set_access_token(info['at'], info['ats'])
@@ -59,7 +74,6 @@ def post_tweet(statusmsg, info):
 
 # get tweets as a map of <id, message>
 def get_tweets(num):
-
     if tweet_store.num() is 0:
         tweets = api.home_timeline(count=num)
     else:
@@ -88,13 +102,12 @@ def get_tweets(num):
 
 
 def filter_tweet(tid, text):
-
     split = text.split()
     is_filtered = filter_prefix(split, '&') \
-        or filter_prefix(split, '@') \
-        or len(split) <= 2 \
-        or split[0] == "RT" \
-        or split[0] == "@"
+                  or filter_prefix(split, '@') \
+                  or len(split) <= 2 \
+                  or split[0] == "RT" \
+                  or split[0] == "@"
 
     if is_filtered:
         tweet_store.remove(tid)
@@ -110,23 +123,13 @@ def tweepy_init():
     print("Initialising Tweepy...")
     tokens = open('tokens.txt')
     info = {
-        'ck': "",
-        'cs': "",
-        'at': "",
-        'ats': ""
+        'ck': tokens.readline()[:-1],
+        'cs': tokens.readline()[:-1],
+        'at': tokens.readline()[:-1],
+        'ats': tokens.readline()[:-1]
     }
 
-    consumer_key = tokens.readline()
-    consumer_secret = tokens.readline()
-    access_token = tokens.readline()
-    access_token_secret = tokens.readline()
     tokens.close()
-
-    # Remove the NewLineCharacter;
-    info['ck'] = consumer_key[:-1]
-    info['cs'] = consumer_secret[:-1]
-    info['at'] = access_token[:-1]
-    info['ats'] = access_token_secret[:-1]
     print("Complete!")
     return info
 
@@ -143,22 +146,8 @@ def first_word(s):
         if s[i] is None:
             continue
 
-        t.append(list(filter(lambda o: o[0:5] != "https", s[i].split())))
+        t.append(list(filter(lambda o: not re.compile(r'.*(https|http)://').search(o), s[i].split())))
         e.append(t[i][0])
-
-        # left the old code here in case there is
-        # an issue with the new version, too tired
-        # to properly test it right now.
-        #
-        # good luck with the demo :)
-
-        #     splitText = s[i].split()
-        #     if splitText[-1][0:5] == "https":
-        #         t.append(splitText[:-1])
-        #     else:
-        #         t.append(splitText)
-        #     e.append(t[i][0])
-        # return e, t
 
     return e, t
 
@@ -169,10 +158,12 @@ def second_word(s, e, t):
     for i in range(len(s)):
         if s[i] is None:
             continue
+
         d[e[i]] = []
         for j, k in enumerate(e):
             if k == e[i] and len(t[j]) > 1:
                 d[e[i]].append(t[j][1])
+
     return d
 
 
@@ -182,52 +173,60 @@ def other_word(s, e, t):
         if s[i] is None:
             continue
         for p in range(len(t[i])):
-            if(not(t[i][p] in d0.keys())):
+            if not (t[i][p] in d0.keys()):
                 d0[t[i][p]] = []
             for j, k in enumerate(t[i]):
                 if k == t[i][p] and j != len(t[i]) - 1:
                     d0[t[i][p]].append(t[i][j + 1])
     return d0
 
-def buildWord(s,e,t):
-	pf0 = ""
-	print("Building output...", end="", flush=True)
-	rFlag = True  # flag to check for repeat
-	while rFlag:
-		f0 = e[r.randint(0, len(e) - 1)]  # first word
-		if f0 != pf0 and len(d[f0]) > 0:
-			rFlag = False
-	pf0 = f0  # Store first word into variable so it can avoid repeats
-	f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
-	#f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
-	output = f0 + " " + f1
-	op = f1
-	if(len(d0[f1])>0):
-		end = False
-		while not end:
-			try:
-				on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
-				op = on  # output previous
-				output = output + " " + op
-				if len(d0[op]) == 0:
-					# output=output + "."
-					end = True
-			except:
-				# output=output + "."
-				break
-	# Add a full stop to the end if necessary.
-	if output[len(output) - 1] != '.':
-		output = output + "."
-	print("Complete!\n", flush=True)
-	return output;
+
+def build_word(s, e, t):
+    pf0 = ""
+    print("Building output...", end="", flush=True)
+    rFlag = True  # flag to check for repeat
+    while rFlag:
+        f0 = e[r.randint(0, len(e) - 1)]  # first word
+        if f0 != pf0 and len(d[f0]) > 0:
+            rFlag = False
+    pf0 = f0  # Store first word into variable so it can avoid repeats
+    f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
+    # f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
+    output = f0 + " " + f1
+    op = f1
+    if len(d0[f1]) > 0:
+        end = False
+        while not end:
+            try:
+                on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
+                op = on  # output previous
+                output = output + " " + op
+                if len(d0[op]) == 0:
+                    # output=output + "."
+                    end = True
+            except:
+                # output=output + "."
+                break
+
+    # Add a full stop to the end if necessary.
+    if output[len(output) - 1] != '.':
+        output += "."
+
+    print("Complete!\n", flush=True)
+
+    return output
+
 
 tweepyInfo = tweepy_init()
 api = get_api(tweepyInfo)
 
+# ----------------------------
 # Parameters
-
+# ----------------------------
 # number of tweets to read (capped at 200 by twitter)
-numTweet = 200
+numTweet = int(config["tweets"]["historyLimit"])
+# time between tweets in seconds
+delay = int(config["tweets"]["frequencySeconds"])
 # size of overall storage buffer
 buffSize = 1000
 # current position of buffer
@@ -236,16 +235,15 @@ buffPos = 0
 master = [None] * buffSize
 match = False
 
-delay = 1800  # in seconds
+# text to speech thingy
+speak = init_tts()
+
 # key, array of first values
 e = []
 t = []
 # define dictionary, this will hold each word and the location
 d = {}
 d0 = {}
-#text to speak stuff
-speak = pyttsx3.init();
-speak.setProperty('rate',80);
 
 # Filter for removing punctuation (except sentence endings)
 puncFilter = str.maketrans('', '', '\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
@@ -275,14 +273,17 @@ while True:
     d0 = other_word(master, e, t)
     print("Complete!", flush=True)
 
-    output=buildWord(master,e,t);
-    while len(output)>140:
-    	output=buildWord(master,e,t);
+    output = build_word(master, e, t)
+    while len(output) > 140:
+        output = build_word(master, e, t)
+
     print("*****************************************", flush=True)
     print("\n" + output + "\n", flush=True)
-    speak.say(output);
+    # speak.say(output)
     print("*****************************************", flush=True)
-    speak.runAndWait();
+    # speak.runAndWait()
+    say(output)
+
     # e.clear();
     # t.clear();
     # d.clear();
@@ -290,5 +291,5 @@ while True:
     # d0.clear();
     # post_tweet(output, tweepyInfo)
     # except:
-    #	print("Algorithm Error, Retrying in 5 minutes.");
+    #	print("Algorithm Error, Retrying in 5 minutes.")
     time.sleep(delay)

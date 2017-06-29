@@ -1,4 +1,17 @@
 {
-  "tweetFrequency": "5",
-  "tweetHistoryLimit": "20"
+  "tweets": {
+    "frequencySeconds": "1800",
+    "historyLimit": "200"
+  },
+  "filter": {
+    "filterLinks": true,
+    "filterPatterns": [],
+    "filterPrefixes": ["&", "@"],
+    "filterFirstWords": ["RT", "@"],
+    "minLength": 2
+  },
+  "textToSpeech": {
+    "enabled": true,
+    "rate": 80
+  }
 }
