@@ -10,7 +10,7 @@ import re
 import tweet_store
 from tqdm import tqdm
 import pyttsx3
-from settings import config
+import settings
 
 
 # ----------------------------
@@ -38,15 +38,15 @@ def filter_prefix(t, prefix):
 #   text-to-speech
 # ----------------------------
 def init_tts():
-    if bool(config["textToSpeech"]["enabled"]):
+    if settings.is_text_to_speech_enabled():
         speak = pyttsx3.init()
-        speak.setProperty('rate', int(config["textToSpeech"]["rate"]))
+        speak.setProperty('rate', settings.get_text_to_speech_rate())
         return speak
     return None
 
 
 def say(text):
-    if bool(config["textToSpeech"]["enabled"]):
+    if settings.is_text_to_speech_enabled():
         speak.say(text)
         speak.runAndWait()
 
@@ -95,6 +95,10 @@ def get_tweets(num):
         if '…' in text:
             tweet_store.update(tid, get_full_tweet(tid))
             filter_tweet(tid, text)
+
+        if settings.get_filter_links():
+            tweet_store.update(tid, " ".join(list(filter(lambda o: not re.compile(r'.*(https|http)://').search(o), tweet_store.get(tid).split()))))
+
         count += 1
         # print(text)
 
@@ -102,17 +106,33 @@ def get_tweets(num):
 
 
 def filter_tweet(tid, text):
+
+    # if matches any patterns
+    for filterPattern in settings.get_filter_patterns():
+        if filterPattern.search(text):
+            tweet_store.remove(tid)
+            return True
+
+    # or matches any prefixes
     split = text.split()
-    is_filtered = filter_prefix(split, '&') \
-                  or filter_prefix(split, '@') \
-                  or len(split) <= 2 \
-                  or split[0] == "RT" \
-                  or split[0] == "@"
 
-    if is_filtered:
+    for filterPrefix in settings.get_filter_prefixes():
+        if filter_prefix(split, filterPrefix):
+            tweet_store.remove(tid)
+            return True
+
+    # or matches any first words
+    for filterFirstWord in settings.get_filter_first_words():
+        if split[0] == filterFirstWord:
+            tweet_store.remove(tid)
+            return True
+
+    # or is too short
+    if len(split) < settings.get_filter_min_length():
         tweet_store.remove(tid)
+        return True
 
-    return is_filtered
+    return False
 
 
 def get_full_tweet(tweet_id):
@@ -146,7 +166,7 @@ def first_word(s):
         if s[i] is None:
             continue
 
-        t.append(list(filter(lambda o: not re.compile(r'.*(https|http)://').search(o), s[i].split())))
+        t.append(s[i].split())
         e.append(t[i][0])
 
     return e, t
@@ -183,7 +203,7 @@ def other_word(s, e, t):
 
 def build_word(s, e, t):
     pf0 = ""
-    print("Building output...", end="", flush=True)
+    # print("Building output...", end="", flush=True)
     rFlag = True  # flag to check for repeat
     while rFlag:
         f0 = e[r.randint(0, len(e) - 1)]  # first word
@@ -209,10 +229,11 @@ def build_word(s, e, t):
                 break
 
     # Add a full stop to the end if necessary.
-    if output[len(output) - 1] != '.':
+    lastchar = output[len(output) - 1]
+    if lastchar != '.' or lastchar != '?' or lastchar != '!':
         output += "."
 
-    print("Complete!\n", flush=True)
+    # print("Complete!\n", flush=True)
 
     return output
 
@@ -224,9 +245,9 @@ api = get_api(tweepyInfo)
 # Parameters
 # ----------------------------
 # number of tweets to read (capped at 200 by twitter)
-numTweet = int(config["tweets"]["historyLimit"])
+numTweet = settings.get_tweet_history_limit()
 # time between tweets in seconds
-delay = int(config["tweets"]["frequencySeconds"])
+delay = settings.get_tweet_frequency()
 # size of overall storage buffer
 buffSize = 1000
 # current position of buffer
@@ -267,22 +288,23 @@ while True:
             buffPos %= buffSize
 
     time.sleep(1)
+    # print(tweet_store.tweets)
     print("Calculating markov chain...", end="", flush=True)
     e, t = first_word(master)
     d = second_word(master, e, t)
     d0 = other_word(master, e, t)
     print("Complete!", flush=True)
 
-    output = build_word(master, e, t)
-    while len(output) > 140:
+    for herpderp in range(12):
         output = build_word(master, e, t)
+        while len(output) > 140:
+            output = build_word(master, e, t)
 
-    print("*****************************************", flush=True)
-    print("\n" + output + "\n", flush=True)
-    # speak.say(output)
-    print("*****************************************", flush=True)
-    # speak.runAndWait()
-    say(output)
+        print("*****************************************", flush=True)
+        print("" + output + "", flush=True)
+        # print("*****************************************", flush=True)
+
+        say(output)
 
     # e.clear();
     # t.clear();

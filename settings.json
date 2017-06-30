@@ -7,11 +7,11 @@
     "filterLinks": true,
     "filterPatterns": [],
     "filterPrefixes": ["&", "@"],
-    "filterFirstWords": ["RT", "@"],
+    "filterFirstWords": ["RT"],
     "minLength": 2
   },
   "textToSpeech": {
-    "enabled": true,
+    "enabled": false,
     "rate": 80
   }
 }
