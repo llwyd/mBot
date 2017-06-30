@@ -94,7 +94,8 @@ def get_tweets(num):
         # as this is slow
         if '…' in text:
             tweet_store.update(tid, get_full_tweet(tid))
-            filter_tweet(tid, text)
+            if filter_tweet(tid, text):
+                continue
 
         if settings.get_filter_links():
             tweet_store.update(tid, " ".join(list(filter(lambda o: not re.compile(r'.*(https|http)://').search(o), tweet_store.get(tid).split()))))
@@ -162,7 +163,6 @@ def first_word(s):
     t = []
 
     for i in range(len(s)):
-
         if s[i] is None:
             continue
 
