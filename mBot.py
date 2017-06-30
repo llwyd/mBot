@@ -295,16 +295,15 @@ while True:
     d0 = other_word(master, e, t)
     print("Complete!", flush=True)
 
-    for herpderp in range(12):
+    output = build_word(master, e, t)
+    while len(output) > 140:
         output = build_word(master, e, t)
-        while len(output) > 140:
-            output = build_word(master, e, t)
 
-        print("*****************************************", flush=True)
-        print("" + output + "", flush=True)
-        # print("*****************************************", flush=True)
+    print("*****************************************", flush=True)
+    print("" + output + "", flush=True)
+    print("*****************************************", flush=True)
 
-        say(output)
+    say(output)
 
     # e.clear();
     # t.clear();
