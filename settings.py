@@ -9,6 +9,8 @@ def get_tweet_frequency():
 def get_tweet_history_limit():
     return int(__config["tweets"]["historyLimit"])
 
+def get_tweet_post():
+    return __config["tweets"]["post"]
 
 def get_filter_links():
     return __config["filter"]["filterLinks"]

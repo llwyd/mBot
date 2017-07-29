@@ -268,6 +268,8 @@ d0 = {}
 
 # Filter for removing punctuation (except sentence endings)
 puncFilter = str.maketrans('', '', '\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
+#flag for enabling tweets
+active=settings.get_tweet_post();
 
 while True:
     # try:
@@ -304,13 +306,8 @@ while True:
     print("*****************************************", flush=True)
 
     say(output)
-
-    # e.clear();
-    # t.clear();
-    # d.clear();
-    # s.clear();
-    # d0.clear();
-    # post_tweet(output, tweepyInfo)
+    if(active==True):
+        post_tweet(output, tweepyInfo)
     # except:
     #	print("Algorithm Error, Retrying in 5 minutes.")
     time.sleep(delay)
