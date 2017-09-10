@@ -7,3 +7,4 @@ tweets.json
 .idea/
 __pycache__/
 
+*.npy

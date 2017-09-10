@@ -9,9 +9,15 @@ import time
 import re
 import tweet_store
 from tqdm import tqdm
-import pyttsx3
 import settings
+import numpy as np
+import os
 
+#-------------------------------------------------------------
+#
+#       VARIOUS FUNCTIONS
+#
+#-------------------------------------------------------------
 
 # ----------------------------
 #   Text Filtering
@@ -154,54 +160,7 @@ def tweepy_init():
     print("Complete!")
     return info
 
-
-# ----------------------------
-#   Markov Stuff
-# ----------------------------
-def first_word(s):
-    e = []
-    t = []
-
-    for i in range(len(s)):
-        if s[i] is None:
-            continue
-
-        t.append(s[i].split())
-        e.append(t[i][0])
-
-    return e, t
-
-
-# this loop works out which words are duplicate so it can begin the p structure
-def second_word(s, e, t):
-    d = {}
-    for i in range(len(s)):
-        if s[i] is None:
-            continue
-
-        d[e[i]] = []
-        for j, k in enumerate(e):
-            if k == e[i] and len(t[j]) > 1:
-                d[e[i]].append(t[j][1])
-
-    return d
-
-
-def other_word(s, e, t):
-    d0 = {}
-    for i in range(len(s)):
-        if s[i] is None:
-            continue
-        for p in range(len(t[i])):
-            if not (t[i][p] in d0.keys()):
-                d0[t[i][p]] = []
-            for j, k in enumerate(t[i]):
-                if k == t[i][p] and j != len(t[i]) - 1:
-                    d0[t[i][p]].append(t[i][j + 1])
-    return d0
-
-
-def build_word(s, e, t):
+def build_word(e,d,d0):
     pf0 = ""
     # print("Building output...", end="", flush=True)
     rFlag = True  # flag to check for repeat
@@ -237,7 +196,11 @@ def build_word(s, e, t):
 
     return output
 
-
+#-------------------------------------------------------------
+#
+#       PROGRAM BEGINS HERE
+#
+#-------------------------------------------------------------
 tweepyInfo = tweepy_init()
 api = get_api(tweepyInfo)
 
@@ -252,62 +215,114 @@ delay = settings.get_tweet_frequency()
 buffSize = 1000
 # current position of buffer
 buffPos = 0
-
-master = [None] * buffSize
-match = False
-
-# text to speech thingy
-speak = init_tts()
-
+#master list of tweets
+master = []
 # key, array of first values
 e = []
 t = []
 # define dictionary, this will hold each word and the location
 d = {}
 d0 = {}
-
 # Filter for removing punctuation (except sentence endings)
 puncFilter = str.maketrans('', '', '\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
 #flag for enabling tweets
 active=settings.get_tweet_post();
 
-while True:
-    # try:
-    print("-----------------------------------------", flush=True)
-    s = list(get_tweets(numTweet).values())
-    for i in range(len(s)):
-        s[i] = s[i].translate(puncFilter)
-        match = False
+print("-----------------------------------------", flush=True)
+# get latest tweets
+s = list(get_tweets(numTweet).values())
+# filter punctuation
+for i in range(len(s)):
+    s[i] = s[i].translate(puncFilter)
+#check if firstWords database exists
+if(os.path.isfile("firstWords.npy")==True):
+    #load the database
+    e=numpy.load("firstWords.npy");
+    #typecase to list for consistency
+    e=list(e);
+else:
+    #if not then create empty list
+    e=[];
+#--------------------------------------
+#   begin filtering of firstWords
+#--------------------------------------
+for i in range(len(s)):
+    if s[i] is None:
+        continue
+    dup=False
+    for j in range(len(e)):
+        if(e[j]==s[i].split()[0]):
+            dup=True;
+            break;
+    if(dup!=True):
+        e.append(s[i].split()[0]);
+    # array of separated words for latest tweets
+    t.append(s[i].split());
 
-        for j in range(len(master)):
-            if s[i] == master[j]:
-                match = True
-                break
+#--------------------------------------
+#   begin filtering of secondWords
+#--------------------------------------
+#check if database exists
+if(os.path.isfile("secondWords.npy")==True):
+    #load the database
+    d=numpy.load("secondWords.npy").item();
+else:
+    #if not then create empty dictionary
+    d={};
+#check if the first word already exists in the dictionary
+for i in range(len(e)):
+    if((e[i] in d))==False:
+        d[e[i]]=[];
+#Create dictionary of first words and second words
+for i in range(len(s)):
+    if s[i] is None:
+        continue
+    dup=False
+    for j in range(len(d[t[i][0]])):
+        if(d[t[i][0]][j])==t[i][1]:
+            dup=True;
+            break;
+    if(dup!=True):
+        d[t[i][0]].append(t[i][1]);
 
-        if not match:
-            master[buffPos] = s[i]
-            buffPos += 1
-            buffPos %= buffSize
+#--------------------------------------
+#   begin filtering of otherWords
+#--------------------------------------
+#check if database exists
+if(os.path.isfile("otherWords.npy")==True):
+    #load the database
+    d0=numpy.load("otherWords.npy").item();
+else:
+    #if not then create empty dictionary
+    d0={};
+#check if word already exists
+for i in range(len(s)):
+    if s[i] is None:
+        continue
+    for p in range(1,len(t[i])):
+        if not (t[i][p] in d0.keys()):
+            d0[t[i][p]] = [];
+#add new words to database
+for i in range(len(s)):
+    if s[i] is None:
+        continue
+    for j in range(2,len(t[i])):
+        dup=False
+        for k in range(len(d0[t[i][j-1]])):
+            if d0[t[i][j-1]][k]==t[i][j]:
+                dup=True;
+                break;
+        if(dup!=True):
+            d0[t[i][j-1]].append(t[i][j]);
+ 
 
-    time.sleep(1)
-    # print(tweet_store.tweets)
-    print("Calculating markov chain...", end="", flush=True)
-    e, t = first_word(master)
-    d = second_word(master, e, t)
-    d0 = other_word(master, e, t)
-    print("Complete!", flush=True)
+output = build_word(e,d,d0)
+while len(output) > 140:
+    output = build_word(e,d,d0)
 
-    output = build_word(master, e, t)
-    while len(output) > 140:
-        output = build_word(master, e, t)
+print("*****************************************", flush=True)
+print("" + output + "", flush=True)
+print("*****************************************", flush=True)
 
-    print("*****************************************", flush=True)
-    print("" + output + "", flush=True)
-    print("*****************************************", flush=True)
-
-    say(output)
-    if(active==True):
-        post_tweet(output, tweepyInfo)
-    # except:
-    #	print("Algorithm Error, Retrying in 5 minutes.")
-    time.sleep(delay)
+if(active==True):
+    post_tweet(output, tweepyInfo)
