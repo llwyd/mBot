@@ -227,17 +227,20 @@ d0 = {}
 puncFilter = str.maketrans('', '', '\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
 #flag for enabling tweets
 active=settings.get_tweet_post();
+#flag for enabling punctuation filter
+punc=settings.get_filter_punc();
 
 print("-----------------------------------------", flush=True)
 # get latest tweets
 s = list(get_tweets(numTweet).values())
 # filter punctuation
-for i in range(len(s)):
-    s[i] = s[i].translate(puncFilter)
+if(punc==True):
+    for i in range(len(s)):
+        s[i] = s[i].translate(puncFilter)
 #check if firstWords database exists
 if(os.path.isfile("firstWords.npy")==True):
     #load the database
-    e=numpy.load("firstWords.npy");
+    e=np.load("firstWords.npy");
     #typecase to list for consistency
     e=list(e);
 else:
@@ -265,7 +268,7 @@ for i in range(len(s)):
 #check if database exists
 if(os.path.isfile("secondWords.npy")==True):
     #load the database
-    d=numpy.load("secondWords.npy").item();
+    d=np.load("secondWords.npy").item();
 else:
     #if not then create empty dictionary
     d={};
@@ -291,7 +294,7 @@ for i in range(len(s)):
 #check if database exists
 if(os.path.isfile("otherWords.npy")==True):
     #load the database
-    d0=numpy.load("otherWords.npy").item();
+    d0=np.load("otherWords.npy").item();
 else:
     #if not then create empty dictionary
     d0={};
@@ -320,9 +323,19 @@ output = build_word(e,d,d0)
 while len(output) > 140:
     output = build_word(e,d,d0)
 
+
+#Store databases
+np.save("firstWords.npy",e);
+np.save("secondWords.npy",d);
+np.save("otherWords.npy",d0);
+
 print("*****************************************", flush=True)
 print("" + output + "", flush=True)
 print("*****************************************", flush=True)
 
 if(active==True):
     post_tweet(output, tweepyInfo)
+else:
+    debugPost=input("Would you like to post this?(y/n)");
+    if(debugPost=='y'):
+        post_tweet(output, tweepyInfo);

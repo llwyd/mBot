@@ -27,6 +27,8 @@ def get_filter_prefixes():
 def get_filter_first_words():
     return __config["filter"]["filterFirstWords"]
 
+def get_filter_punc():
+    return __config["filter"]["punctuation"]
 
 def get_filter_min_length():
     return int(__config["filter"]["minLength"])
