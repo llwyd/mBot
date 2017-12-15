@@ -1,8 +1,8 @@
 {
   "tweets": {
     "frequencySeconds": "1800",
-    "historyLimit": "200",
-    "post": true
+    "historyLimit": "50",
+    "post": false
   },
   "filter": {
     "filterLinks": true,
@@ -10,7 +10,7 @@
     "filterPrefixes": ["&", "@"],
     "filterFirstWords": ["RT"],
     "minLength": 2,
-    "punctuation":false
+    "punctuation":true
   },
   "textToSpeech": {
     "enabled": false,
