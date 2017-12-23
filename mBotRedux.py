@@ -19,6 +19,8 @@ import datetime as dt
 import sys
 import twitter as tw
 import json
+import collections
+
 
 def build_word(e,d,d0):
 	r.seed(dt.datetime.now());
@@ -104,37 +106,58 @@ else:
 	pos['id']=0;
 #get tweets
 if(pos['id']==0):
-	tweets = api.home_timeline(count=numTweet);
+	tweets = api.home_timeline(count=numTweet,tweet_mode='extended');
 else:
-	tweets = api.home_timeline(count=numTweet, since_id=pos['id']);
+	tweets = api.home_timeline(count=numTweet,tweet_mode='extended', since_id=pos['id']);
 #filter text and sort by ids
 latestTweets={};
 for x in tweets:
-	latestTweets[x.id]=x.text;
+	latestTweets[x.id]=x.full_text;
 # re-sort the tweets such that the newest appears first in the dict
 latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
 
+#Put current keys into callable list
+keys=list(latestTweets.keys());
+
 #begin filtering
-for tid in latestTweets:
-	tw.filter_tweet(tid,latestTweets[tid]);
 
+#collect list to purge
+purgeList=[];
+print(len(keys));
+for i in range(len(keys)):
+	#Filter Retweets
+	if(latestTweets[keys[i]][0:2]=="RT"):
+		purgeList.append(i);
+	#Filter direct Messages
+	elif (latestTweets[keys[i]][0]=='@'):
+		purgeList.append(i);
+	#print(i);
+#purge list
+for i in range(len(purgeList)):
+	latestTweets.pop(keys[purgeList[i]]);
+	#keys.pop(purgeList[i]);
+keys=list(latestTweets.keys());
+#for i in range(len(purgeList)):
+#	keys.pop(purgeList[i]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-# s=list(tw.get_tweets(numTweet,api).values());
-# if(punc==True):
-# 	for i in range(len(s)):
-# 		s[i] = s[i].translate(puncFilter);
+#Master list of tweets
+s=list(latestTweets.values());
+#Remove textless image only tweets;
+purgeList=[];
+for i in range(len(s)):
+	if(s[i][0:5]=="https"):
+		purgeList.append(i);
+for i in range(len(purgeList)-1,-1,-1):
+	s.pop(purgeList[i]);
+#punctuation filter
+if(punc==True):
+for i in range(len(s)):
+	s[i]=s[i].translate(puncFilter);
+#Split array of words
+for i in range(len(s)):
+	t.append(s[i].split());
+	if(t[i][-1][0:5]=="https"):
+		t[i].pop(-1);
 # #--------------------------------------
 # #   begin filtering of firstWords
 # #--------------------------------------
