@@ -123,7 +123,7 @@ keys=list(latestTweets.keys());
 
 #collect list to purge
 purgeList=[];
-print(len(keys));
+#print(len(keys));
 for i in range(len(keys)):
 	#Filter Retweets
 	if(latestTweets[keys[i]][0:2]=="RT"):
@@ -151,16 +151,52 @@ for i in range(len(purgeList)-1,-1,-1):
 	s.pop(purgeList[i]);
 #punctuation filter
 if(punc==True):
-for i in range(len(s)):
-	s[i]=s[i].translate(puncFilter);
+	for i in range(len(s)):
+		s[i]=s[i].translate(puncFilter);
 #Split array of words
 for i in range(len(s)):
 	t.append(s[i].split());
 	if(t[i][-1][0:5]=="https"):
 		t[i].pop(-1);
-# #--------------------------------------
-# #   begin filtering of firstWords
-# #--------------------------------------
+#Remove single word tweets
+purgeList=[];
+for i in range(len(t)):
+	if(len(t[i])<2):
+		purgeList.append(i);
+for i in range(len(purgeList)):
+	t.pop(purgeList[i]);
+#--------------------------------------
+#   begin filtering of firstWords
+#--------------------------------------
+for i in range(len(t)):
+	dup=False;
+	for j in range(len(e)):
+		if(t[i][0]==e[j]):
+			dup=True;
+			break;
+	if(dup==False):
+		e.append(t[i][0]);
+#--------------------------------------
+#	Filter second words
+#--------------------------------------
+#check if the first word already exists in the dictionary
+for i in range(len(e)):
+	if((e[i] in d))==False:
+		d[e[i]]=[];
+#Create dictionary of first words and second words
+for i in range(len(t)):
+	dup=False
+	#print(i);
+	for j in range(len(d[t[i][0]])):
+		if(d[t[i][0]][j])==t[i][1]:
+			dup=True;
+			break;
+	if(dup!=True):
+		d[t[i][0]].append(t[i][1]);
+
+
+
+
 # for i in tqdm(range(len(s)),desc='Building Database of first words'):
 # 	if s[i] is None:
 # 		continue
