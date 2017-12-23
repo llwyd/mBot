@@ -56,11 +56,11 @@ def build_word(e,d,d0):
 	# Add a full stop to the end if necessary.
 	#lastchar = output[len(output) - 1]
 	lastchar=output[-1];
-	print(output);
+	#print(output);
 	#This doesnt work, wtf
 	if ((output[-1] != '.') or (output[-1] != '?') or (output[-1] != '!')):
 		output += "."
-	print(output);
+	#print(output);
 	# print("Complete!\n", flush=True)
 	return output
 
@@ -218,9 +218,9 @@ for i in range(len(s)):
 		if(dup!=True):
 			d0[t[i][j-1]].append(t[i][j]);
 output = build_word(e,d,d0)
-while len(output) < 280:
+while len(output) > 280:
 	output = build_word(e,d,d0)
-print(output);
+print(output+"\n");
 
 
 # for i in tqdm(range(len(s)),desc='Building Database of first words'):
