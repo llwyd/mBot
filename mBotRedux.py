@@ -54,9 +54,11 @@ def build_word(e,d,d0):
 				break
 
 	# Add a full stop to the end if necessary.
-	lastchar = output[len(output) - 1]
+	#lastchar = output[len(output) - 1]
+	lastchar=output[-1];
 	print(output);
-	if lastchar != '.' or lastchar != '?' or lastchar != '!':
+	#This doesnt work, wtf
+	if ((output[-1] != '.') or (output[-1] != '?') or (output[-1] != '!')):
 		output += "."
 	print(output);
 	# print("Complete!\n", flush=True)
@@ -193,8 +195,32 @@ for i in range(len(t)):
 			break;
 	if(dup!=True):
 		d[t[i][0]].append(t[i][1]);
-
-
+#--------------------------------------
+#	Other Words
+#--------------------------------------
+#check if word already exists
+for i in range(len(s)):
+	if s[i] is None:
+		continue
+	for p in range(1,len(t[i])):
+		if not (t[i][p] in d0.keys()):
+			d0[t[i][p]] = [];
+#add new words to database
+for i in range(len(s)):
+	if s[i] is None:
+		continue
+	for j in range(2,len(t[i])):
+		dup=False
+		for k in range(len(d0[t[i][j-1]])):
+			if d0[t[i][j-1]][k]==t[i][j]:
+				dup=True;
+				break;
+		if(dup!=True):
+			d0[t[i][j-1]].append(t[i][j]);
+output = build_word(e,d,d0)
+while len(output) < 280:
+	output = build_word(e,d,d0)
+print(output);
 
 
 # for i in tqdm(range(len(s)),desc='Building Database of first words'):
