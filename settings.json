@@ -1,7 +1,7 @@
 {
   "tweets": {
     "frequencySeconds": "1800",
-    "historyLimit": "150",
+    "historyLimit": "200",
     "post": false
   },
   "filter": {
