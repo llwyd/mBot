@@ -21,6 +21,17 @@ import twitter as tw
 import json
 import collections
 
+def post_tweet(statusmsg, info):
+	auth = tweepy.OAuthHandler(info['ck'], info['cs'])
+	auth.set_access_token(info['at'], info['ats'])
+
+	try:
+		api.update_status(status=statusmsg)
+		print('Tweet Successful')
+	except Exception:
+		# Stops everything crashing if there is a connection issue.
+		print('Tweet Unsuccessful')
+
 
 def build_word(e,d,d0):
 	r.seed(dt.datetime.now());
@@ -67,7 +78,8 @@ def build_word(e,d,d0):
 
 #Initialise Tweepy
 try:
-	api = tw.get_api(tw.tweepy_init());
+	tweetStuff=tw.tweepy_init();
+	api = tw.get_api(tweetStuff);
 except Exception as ex:
 	print(ex);
 	sys.exit(1);
@@ -160,6 +172,8 @@ for i in range(len(s)):
 	t.append(s[i].split());
 	if(t[i][-1][0:5]=="https"):
 		t[i].pop(-1);
+	if(t[i][-1][0:5]=="https"):
+		t[i].pop(-1);
 #Remove single word tweets
 purgeList=[];
 for i in range(len(t)):
@@ -222,60 +236,4 @@ while len(output) > 280:
 	output = build_word(e,d,d0)
 print(output+"\n");
 
-
-# for i in tqdm(range(len(s)),desc='Building Database of first words'):
-# 	if s[i] is None:
-# 		continue
-# 	dup=False
-# 	for j in range(len(e)):
-# 		if(e[j]==s[i].split()[0]):
-# 			dup=True;
-# 			break;
-# 	if(dup!=True):
-# 		e.append(s[i].split()[0]);
-# 	# array of separated words for latest tweets
-# 	t.append(s[i].split());
-# #--------------------------------------
-# #   begin filtering of secondWords
-# #--------------------------------------
-# #check if the first word already exists in the dictionary
-# for i in range(len(e)):
-# 	if((e[i] in d))==False:
-# 		d[e[i]]=[];
-# #Create dictionary of first words and second words
-# for i in range(len(s)):
-# 	if s[i] is None:
-# 		continue
-# 	dup=False
-# 	for j in range(len(d[t[i][0]])):
-# 		if(d[t[i][0]][j])==t[i][1]:
-# 			dup=True;
-# 			break;
-# 	if(dup!=True):
-# 		d[t[i][0]].append(t[i][1]);
-# #--------------------------------------
-# #   begin filtering of otherWords
-# #--------------------------------------
-# #check if word already exists
-# for i in range(len(s)):
-# 	if s[i] is None:
-# 		continue
-# 	for p in range(1,len(t[i])):
-# 		if not (t[i][p] in d0.keys()):
-# 			d0[t[i][p]] = [];
-# #add new words to database
-# for i in range(len(s)):
-# 	if s[i] is None:
-# 		continue
-# 	for j in range(2,len(t[i])):
-# 		dup=False
-# 		for k in range(len(d0[t[i][j-1]])):
-# 			if d0[t[i][j-1]][k]==t[i][j]:
-# 				dup=True;
-# 				break;
-# 		if(dup!=True):
-# 			d0[t[i][j-1]].append(t[i][j]);
-
-# output = build_word(e,d,d0)
-# while len(output) > 140:
-# 	output = build_word(e,d,d0)
+post_tweet(output,tweetStuff);
