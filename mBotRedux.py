@@ -20,6 +20,7 @@ import sys
 import twitter as tw
 import json
 import collections
+import pickle
 
 def post_tweet(statusmsg, info):
 	auth = tweepy.OAuthHandler(info['ck'], info['cs'])
@@ -155,7 +156,14 @@ keys=list(latestTweets.keys());
 #	keys.pop(purgeList[i]);
 
 #Master list of tweets
-s=list(latestTweets.values());
+new=list(latestTweets.values());
+
+with open("database.txt","rb") as fp:
+	s=pickle.load(fp);
+
+for i in range(len(new)):
+	s.append(new[i]);
+
 #Remove textless image only tweets;
 purgeList=[];
 for i in range(len(s)):
@@ -237,3 +245,7 @@ while len(output) > 280:
 print(output+"\n");
 
 post_tweet(output,tweetStuff);
+
+with open ("database.txt","wb") as fp:
+	pickle.dump(s,fp);
+
