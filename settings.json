@@ -10,7 +10,7 @@
     "filterPrefixes": ["&", "@"],
     "filterFirstWords": ["RT"],
     "minLength": 2,
-    "punctuation":True
+    "punctuation":false
   },
   "textToSpeech": {
     "enabled": false,

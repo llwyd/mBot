@@ -78,7 +78,7 @@ def build_word(e,d,d0):
 	testOut=output;
 	if (output[-1] != '.') and (output[-1] != '?') and (output[-1] != '!'):
 		output += '.'
-	return output,testOut
+	return output
 
 
 #Initialise Tweepy
@@ -109,7 +109,7 @@ try:
 	d = {}
 	d0 = {}
 	# Filter for removing punctuation (except sentence endings)
-	puncFilter = str.maketrans('', '', '…\"$%&\'()”"*+-/:;<=>[\\]^_`{|}~')
+	puncFilter = str.maketrans('', '', '…\"$%&\'()”"*+-/<=>[\\]^_`{|}~')
 	#flag for enabling tweets
 	active=settings.get_tweet_post();
 	#flag for enabling punctuation filter
@@ -262,12 +262,14 @@ for i in range(len(s)):
 				break;
 		if(dup!=True):
 			d0[t[i][j-1]].append(t[i][j]);
-output,meow = build_word(e,d,d0)
+output = build_word(e,d,d0)
 while len(output) > 140:
-	output,meow = build_word(e,d,d0)
+	output= build_word(e,d,d0)
 print(output+"\n");
 
-#post_tweet(output,tweetStuff);
+debugPost=input("Would you like to post this?(y/n)");
+if(debugPost=='y'):
+	post_tweet(output,tweetStuff);
 
 print("Storing database...")
 with open ("database.pkl","wb") as fp:
