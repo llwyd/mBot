@@ -1,7 +1,7 @@
 #
 #
 #
-#   Markov chain bot
+#   markovMagpie
 #		v0.2
 #
 #
@@ -70,26 +70,17 @@ def build_word(e,d,d0):
 	lastchar=output[-1];
 	#print(output);
 	#This doesnt work, wtf
-	if ((output[-1] != '.') or (output[-1] != '?') or (output[-1] != '!')):
-		output += "."
-	#print(output);
-	# print("Complete!\n", flush=True)
-	return output
+	testOut=output;
+	if (output[-1] != '.') and (output[-1] != '?') and (output[-1] != '!'):
+		output += '.'
+	return output,testOut
 
 
-#Initialise Tweepy
-try:
-	tweetStuff=tw.tweepy_init();
-	api = tw.get_api(tweetStuff);
-except Exception as ex:
-	print(ex);
-	sys.exit(1);
-#Set Parameters
 try:
 	# number of tweets to read (capped at 200 by twitter)
-	numTweet = settings.get_tweet_history_limit()
+	#numTweet = settings.get_tweet_history_limit()
 	# time between tweets in seconds
-	delay = settings.get_tweet_frequency()
+	#delay = settings.get_tweet_frequency()
 	# size of overall storage buffer
 	buffSize = 1000
 	# current position of buffer
@@ -112,57 +103,10 @@ except Exception as ex:
 	print(ex);
 	sys.exit(1);
 
-if(os.path.isfile("misc.json")==True):
-	with open('misc.json') as data_file:
-		pos=json.load(data_file);
-		data_file.close();
-else:
-	pos={};
-	pos['id']=0;
-#get tweets
-if(pos['id']==0):
-	tweets = api.home_timeline(count=numTweet,tweet_mode='extended');
-else:
-	tweets = api.home_timeline(count=numTweet,tweet_mode='extended', since_id=pos['id']);
-#filter text and sort by ids
-latestTweets={};
-for x in tweets:
-	latestTweets[x.id]=x.full_text;
-# re-sort the tweets such that the newest appears first in the dict
-latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
 
-#Put current keys into callable list
-keys=list(latestTweets.keys());
-
-#begin filtering
-
-#collect list to purge
-purgeList=[];
-#print(len(keys));
-for i in range(len(keys)):
-	#Filter Retweets
-	if(latestTweets[keys[i]][0:2]=="RT"):
-		purgeList.append(i);
-	#Filter direct Messages
-	elif (latestTweets[keys[i]][0]=='@'):
-		purgeList.append(i);
-	#print(i);
-#purge list
-for i in range(len(purgeList)):
-	latestTweets.pop(keys[purgeList[i]]);
-	#keys.pop(purgeList[i]);
-keys=list(latestTweets.keys());
-#for i in range(len(purgeList)):
-#	keys.pop(purgeList[i]);
-
-#Master list of tweets
-new=list(latestTweets.values());
-
-with open("database.txt","rb") as fp:
-	s=pickle.load(fp);
-
-for i in range(len(new)):
-	s.append(new[i]);
+f=open('data.txt');
+s=f.readlines();
+f.close();
 
 #Remove textless image only tweets;
 purgeList=[];
@@ -239,13 +183,13 @@ for i in range(len(s)):
 				break;
 		if(dup!=True):
 			d0[t[i][j-1]].append(t[i][j]);
-output = build_word(e,d,d0)
+output,meow = build_word(e,d,d0)
 while len(output) > 280:
-	output = build_word(e,d,d0)
+	output,meow = build_word(e,d,d0)
 print(output+"\n");
 
-post_tweet(output,tweetStuff);
+#post_tweet(output,tweetStuff);
 
-with open ("database.txt","wb") as fp:
-	pickle.dump(s,fp);
+#with open ("database.txt","wb") as fp:
+#	pickle.dump(s,fp);
 

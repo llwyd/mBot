@@ -6,5 +6,5 @@ tweets.json
 database.txt
 .idea/
 __pycache__/
-
+sparecode.py
 *.npy
