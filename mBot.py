@@ -109,7 +109,7 @@ try:
 	d = {}
 	d0 = {}
 	# Filter for removing punctuation (except sentence endings)
-	puncFilter = str.maketrans('', '', '…\"$%&\'()*+,-/:;<=>[\\]‘^_`{|}~')
+	puncFilter = str.maketrans('', '', '…\"$%&\'()”"*+-/:;<=>[\\]^_`{|}~')
 	#flag for enabling tweets
 	active=settings.get_tweet_post();
 	#flag for enabling punctuation filter
@@ -123,53 +123,57 @@ except Exception as ex:
 #f=open('data.txt');
 #s=f.readlines();
 #f.close();
+rateLimit=False;
 
+try:
+	if(os.path.isfile("misc.json")==True):
+		with open('misc.json') as data_file:
+			pos=json.load(data_file);
+			data_file.close();
+	else:
+		pos={};
+		pos['id']=0;
+	#get tweets
+	if(pos['id']==0):
+		tweets = api.home_timeline(count=numTweet,tweet_mode='extended');
+	else:
+		tweets = api.home_timeline(count=numTweet,tweet_mode='extended', since_id=pos['id']);
+	#filter text and sort by ids
+	latestTweets={};
+	for x in tweets:
+		latestTweets[x.id]=x.full_text;
+	# re-sort the tweets such that the newest appears first in the dict
+	latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
 
-if(os.path.isfile("misc.json")==True):
-	with open('misc.json') as data_file:
-		pos=json.load(data_file);
-		data_file.close();
-else:
-	pos={};
-	pos['id']=0;
-#get tweets
-if(pos['id']==0):
-	tweets = api.home_timeline(count=numTweet,tweet_mode='extended');
-else:
-	tweets = api.home_timeline(count=numTweet,tweet_mode='extended', since_id=pos['id']);
-#filter text and sort by ids
-latestTweets={};
-for x in tweets:
-	latestTweets[x.id]=x.full_text;
-# re-sort the tweets such that the newest appears first in the dict
-latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
+	#Put current keys into callable list
+	keys=list(latestTweets.keys());
 
-#Put current keys into callable list
-keys=list(latestTweets.keys());
+	#begin filtering
 
-#begin filtering
+	#collect list to purge
+	purgeList=[];
+	#print(len(keys));
+	for i in range(len(keys)):
+		#Filter Retweets
+		if(latestTweets[keys[i]][0:2]=="RT"):
+			purgeList.append(i);
+		#Filter direct Messages
+		elif (latestTweets[keys[i]][0]=='@'):
+			purgeList.append(i);
+		#print(i);
+	#purge list
+	for i in range(len(purgeList)):
+		latestTweets.pop(keys[purgeList[i]]);
+		#keys.pop(purgeList[i]);
+	keys=list(latestTweets.keys());
+	#for i in range(len(purgeList)):
+	#	keys.pop(purgeList[i]);
 
-#collect list to purge
-purgeList=[];
-#print(len(keys));
-for i in range(len(keys)):
-	#Filter Retweets
-	if(latestTweets[keys[i]][0:2]=="RT"):
-		purgeList.append(i);
-	#Filter direct Messages
-	elif (latestTweets[keys[i]][0]=='@'):
-		purgeList.append(i);
-	#print(i);
-#purge list
-for i in range(len(purgeList)):
-	latestTweets.pop(keys[purgeList[i]]);
-	#keys.pop(purgeList[i]);
-keys=list(latestTweets.keys());
-#for i in range(len(purgeList)):
-#	keys.pop(purgeList[i]);
-
-#Master list of tweets
-new=list(latestTweets.values());
+	#Master list of tweets
+	new=list(latestTweets.values());
+except:
+	rateLimit=True;
+	print("Rate limit exceeded, proceeding anyway");
 
 if(os.path.isfile("database.pkl")==True):
 	print("Loading tweet database...")
@@ -178,9 +182,9 @@ if(os.path.isfile("database.pkl")==True):
 else:
 	print("Database not found, creating new...")
 	s=[]
-
-for i in range(len(new)):
-	s.append(new[i]);
+if(rateLimit==False):
+	for i in range(len(new)):
+		s.append(new[i]);
 
 #Remove textless image only tweets;
 purgeList=[];
@@ -259,7 +263,7 @@ for i in range(len(s)):
 		if(dup!=True):
 			d0[t[i][j-1]].append(t[i][j]);
 output,meow = build_word(e,d,d0)
-while len(output) > 280:
+while len(output) > 140:
 	output,meow = build_word(e,d,d0)
 print(output+"\n");
 
