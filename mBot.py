@@ -101,7 +101,7 @@ try:
 	buffPos = 0
 	#master list of tweets
 	master = []
-	s=[]
+	#s=[]
 	# key, array of first values
 	e = []
 	t = []
@@ -171,14 +171,16 @@ keys=list(latestTweets.keys());
 #Master list of tweets
 new=list(latestTweets.values());
 
-#with open("database.txt","rb") as fp:
-#	s=pickle.load(fp);
+if(os.path.isfile("database.pkl")==True):
+	print("Loading tweet database...")
+	with open("database.pkl","rb") as fp:
+		s=pickle.load(fp);
+else:
+	print("Database not found, creating new...")
+	s=[]
 
 for i in range(len(new)):
 	s.append(new[i]);
-
-
-
 
 #Remove textless image only tweets;
 purgeList=[];
@@ -263,6 +265,7 @@ print(output+"\n");
 
 #post_tweet(output,tweetStuff);
 
-#with open ("database.txt","wb") as fp:
-#	pickle.dump(s,fp);
+print("Storing database...")
+with open ("database.pkl","wb") as fp:
+	pickle.dump(s,fp);
 

@@ -4,6 +4,7 @@ tokens.txt
 follow.txt
 tweets.json
 database.txt
+database.pkl
 .idea/
 __pycache__/
 sparecode.py
