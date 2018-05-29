@@ -5,7 +5,9 @@
 #		v0.2
 #
 #
-#import libraries
+#--------------------------------------
+#   Import Libraries
+#--------------------------------------
 import tweepy
 import random as r
 import time
@@ -21,7 +23,9 @@ import twitter as tw
 import json
 import collections
 import pickle
-
+#--------------------------------------
+#   Post a Tweet
+#--------------------------------------
 def post_tweet(statusmsg, info):
 	auth = tweepy.OAuthHandler(info['ck'], info['cs'])
 	auth.set_access_token(info['at'], info['ats'])
@@ -32,8 +36,9 @@ def post_tweet(statusmsg, info):
 	except Exception:
 		# Stops everything crashing if there is a connection issue.
 		print('Tweet Unsuccessful')
-
-
+#--------------------------------------
+#   build a tweet
+#--------------------------------------
 def build_word(e,d,d0):
 	r.seed(dt.datetime.now());
 	pf0 = ""
@@ -76,17 +81,27 @@ def build_word(e,d,d0):
 	return output,testOut
 
 
+#Initialise Tweepy
+try:
+	tweetStuff=tw.tweepy_init();
+	api = tw.get_api(tweetStuff);
+except Exception as ex:
+	print(ex);
+	sys.exit(1);
+#Set Parameters
+
 try:
 	# number of tweets to read (capped at 200 by twitter)
-	#numTweet = settings.get_tweet_history_limit()
+	numTweet = settings.get_tweet_history_limit()
 	# time between tweets in seconds
-	#delay = settings.get_tweet_frequency()
+	delay = settings.get_tweet_frequency()
 	# size of overall storage buffer
 	buffSize = 1000
 	# current position of buffer
 	buffPos = 0
 	#master list of tweets
 	master = []
+	s=[]
 	# key, array of first values
 	e = []
 	t = []
@@ -94,19 +109,76 @@ try:
 	d = {}
 	d0 = {}
 	# Filter for removing punctuation (except sentence endings)
-	puncFilter = str.maketrans('', '', '…\"$%&\'()*+,-/:;<=>@[\\]‘^_`{|}~')
+	puncFilter = str.maketrans('', '', '…\"$%&\'()*+,-/:;<=>[\\]‘^_`{|}~')
 	#flag for enabling tweets
 	active=settings.get_tweet_post();
 	#flag for enabling punctuation filter
-	punc=settings.get_filter_punc();	
+	#punc=settings.get_filter_punc();	
+	punc=True;
 except Exception as ex:
 	print(ex);
 	sys.exit(1);
 
 
-f=open('data.txt');
-s=f.readlines();
-f.close();
+#f=open('data.txt');
+#s=f.readlines();
+#f.close();
+
+
+if(os.path.isfile("misc.json")==True):
+	with open('misc.json') as data_file:
+		pos=json.load(data_file);
+		data_file.close();
+else:
+	pos={};
+	pos['id']=0;
+#get tweets
+if(pos['id']==0):
+	tweets = api.home_timeline(count=numTweet,tweet_mode='extended');
+else:
+	tweets = api.home_timeline(count=numTweet,tweet_mode='extended', since_id=pos['id']);
+#filter text and sort by ids
+latestTweets={};
+for x in tweets:
+	latestTweets[x.id]=x.full_text;
+# re-sort the tweets such that the newest appears first in the dict
+latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
+
+#Put current keys into callable list
+keys=list(latestTweets.keys());
+
+#begin filtering
+
+#collect list to purge
+purgeList=[];
+#print(len(keys));
+for i in range(len(keys)):
+	#Filter Retweets
+	if(latestTweets[keys[i]][0:2]=="RT"):
+		purgeList.append(i);
+	#Filter direct Messages
+	elif (latestTweets[keys[i]][0]=='@'):
+		purgeList.append(i);
+	#print(i);
+#purge list
+for i in range(len(purgeList)):
+	latestTweets.pop(keys[purgeList[i]]);
+	#keys.pop(purgeList[i]);
+keys=list(latestTweets.keys());
+#for i in range(len(purgeList)):
+#	keys.pop(purgeList[i]);
+
+#Master list of tweets
+new=list(latestTweets.values());
+
+#with open("database.txt","rb") as fp:
+#	s=pickle.load(fp);
+
+for i in range(len(new)):
+	s.append(new[i]);
+
+
+
 
 #Remove textless image only tweets;
 purgeList=[];
@@ -117,6 +189,7 @@ for i in range(len(purgeList)-1,-1,-1):
 	s.pop(purgeList[i]);
 #punctuation filter
 if(punc==True):
+	print("Punctuation Filtering...");
 	for i in range(len(s)):
 		s[i]=s[i].translate(puncFilter);
 #Split array of words
