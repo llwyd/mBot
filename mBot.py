@@ -275,3 +275,7 @@ print("Storing database...")
 with open ("database.pkl","wb") as fp:
 	pickle.dump(s,fp);
 
+print("Tweet database entries: "+str(len(s))+" tweets")
+dataSize=os.stat('database.pkl').st_size;
+print("Database size: "+str(dataSize)+"Bytes");
+
