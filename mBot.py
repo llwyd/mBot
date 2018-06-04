@@ -186,6 +186,8 @@ if(rateLimit==False):
 	for i in range(len(new)):
 		s.append(new[i]);
 
+
+
 #Remove textless image only tweets;
 purgeList=[];
 for i in range(len(s)):
@@ -198,6 +200,9 @@ if(punc==True):
 	print("Punctuation Filtering...");
 	for i in range(len(s)):
 		s[i]=s[i].translate(puncFilter);
+#Replace &
+for i in range(len(s)):
+	s[i]=s[i].replace("amp;","and");
 #Split array of words
 for i in range(len(s)):
 	t.append(s[i].split());
@@ -208,9 +213,9 @@ for i in range(len(s)):
 #Remove single word tweets
 purgeList=[];
 for i in range(len(t)):
-	if(len(t[i])<2):
+	if(len(t[i])<3):
 		purgeList.append(i);
-for i in range(len(purgeList)):
+for i in range(len(purgeList)-1,-1,-1):
 	t.pop(purgeList[i]);
 #--------------------------------------
 #   begin filtering of firstWords
@@ -244,14 +249,14 @@ for i in range(len(t)):
 #	Other Words
 #--------------------------------------
 #check if word already exists
-for i in range(len(s)):
-	if s[i] is None:
+for i in range(len(t)):
+	if t[i] is None:
 		continue
 	for p in range(1,len(t[i])):
 		if not (t[i][p] in d0.keys()):
 			d0[t[i][p]] = [];
 #add new words to database
-for i in range(len(s)):
+for i in range(len(t)):
 	if s[i] is None:
 		continue
 	for j in range(2,len(t[i])):
