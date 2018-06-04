@@ -109,7 +109,7 @@ try:
 	d = {}
 	d0 = {}
 	# Filter for removing punctuation (except sentence endings)
-	puncFilter = str.maketrans('', '', '…\"$%&\'()”"*+-/<=>[\\]^_`{|}~')
+	puncFilter = str.maketrans('', '', '…\"$%&\'()“”"*+-/<=>[\\]^_`{|}~')
 	#flag for enabling tweets
 	active=settings.get_tweet_post();
 	#flag for enabling punctuation filter
