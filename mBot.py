@@ -210,6 +210,16 @@ for i in range(len(s)):
 		t[i].pop(-1);
 	if(t[i][-1][0:5]=="https"):
 		t[i].pop(-1);
+#Remove https links from everywhere...
+linkRegex=re.compile(r'https');
+for i in range(len(t)):
+	purgeList=[];
+	for j in range(len(t[i])):
+		mo=linkRegex.search(t[i][j]);
+		if (mo != None):
+			purgeList.append(j);
+	for j in range(len(purgeList)-1,-1,-1):
+		t[i].pop(purgeList[j]);
 #Remove single word tweets
 purgeList=[];
 for i in range(len(t)):
@@ -257,7 +267,7 @@ for i in range(len(t)):
 			d0[t[i][p]] = [];
 #add new words to database
 for i in range(len(t)):
-	if s[i] is None:
+	if t[i] is None:
 		continue
 	for j in range(2,len(t[i])):
 		dup=False
