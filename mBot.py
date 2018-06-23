@@ -276,9 +276,9 @@ while len(output) > 140:
     output = build_word(e, d, d0)
 print(output + "\n")
 
-"""debugPost = input("Would you like to post this?(y/n)")
+debugPost = input("Would you like to post this?(y/n)")
 if debugPost == 'y':
-    post_tweet(output, tweetStuff)"""
+    post_tweet(output, tweetStuff)
 
 print("Storing database...")
 with open("database.pkl", "wb") as fp:
