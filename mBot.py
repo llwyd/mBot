@@ -74,10 +74,14 @@ def build_word(e,d,d0):
 	#lastchar = output[len(output) - 1]
 	lastchar=output[-1];
 	#print(output);
-	#This doesnt work, wtf
+	#This doesnt work, wtf (It does now lol)
 	testOut=output;
 	if (output[-1] != '.') and (output[-1] != '?') and (output[-1] != '!'):
 		output += '.'
+	#REGEX to remove 'MORE:' from the end of shit
+	moreRegex=re.compile(r'MORE:');
+	mo=moreRegex.search(output);
+
 	return output
 
 
