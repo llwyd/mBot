@@ -9,3 +9,4 @@ database.pkl
 __pycache__/
 sparecode.py
 *.npy
+venv/

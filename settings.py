@@ -9,8 +9,10 @@ def get_tweet_frequency():
 def get_tweet_history_limit():
     return int(__config["tweets"]["historyLimit"])
 
+
 def get_tweet_post():
     return __config["tweets"]["post"]
+
 
 def get_filter_links():
     return __config["filter"]["filterLinks"]
@@ -27,8 +29,10 @@ def get_filter_prefixes():
 def get_filter_first_words():
     return __config["filter"]["filterFirstWords"]
 
+
 def get_filter_punc():
     return __config["filter"]["punctuation"]
+
 
 def get_filter_min_length():
     return int(__config["filter"]["minLength"])
@@ -45,15 +49,10 @@ def get_text_to_speech_rate():
 def get_config():
     return __config
 
-# ----------------------------
-#   init config
-# ----------------------------
+
 with open('settings.json') as data_file:
     __config = json.load(data_file)
 
-# ----------------------------
-#   compile regex
-# ----------------------------
 __filter_patterns = []
 
 for p in __config["filter"]["filterPatterns"]:
