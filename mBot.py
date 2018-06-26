@@ -35,63 +35,6 @@ def post_tweet(message, info):
 
 # --------------------------------------
 #   build a tweet
-<<<<<<< HEAD
-#--------------------------------------
-def build_word(e,d,d0):
-	r.seed(dt.datetime.now());
-	pf0 = ""
-	# print("Building output...", end="", flush=True)
-	rFlag = True  # flag to check for repeat
-	while rFlag:
-		f0 = e[r.randint(0, len(e) - 1)]  # first word
-		if len(d[f0]) > 1:
-			rFlag = False
-	rFlag=True;
-	while rFlag:
-		f1 = d[f0][r.randint(0, len(d[f0]) - 1)]  # second word
-		if len(d[f0]) > 1:
-			rFlag = False
-	# f2 = d0[f1][r.randint(0, len(d0[f1]) - 1)]  # anything after can follow this
-	output = f0 + " " + f1
-	op = f1
-	if len(d0[f1]) > 0:
-		end = False
-		while not end:
-			try:
-				on = d0[op][r.randint(0, len(d0[op]) - 1)]  # output new
-				op = on  # output previous
-				output = output + " " + op
-				if len(d0[op]) == 0:
-					# output=output + "."
-					end = True
-			except:
-				# output=output + "."
-				break
-
-	# Add a full stop to the end if necessary.
-	#lastchar = output[len(output) - 1]
-	lastchar=output[-1];
-	#print(output);
-	#This doesnt work, wtf (It does now lol)
-	testOut=output;
-	if (output[-1] != '.') and (output[-1] != '?') and (output[-1] != '!'):
-		output += '.'
-	#REGEX to remove 'MORE:' from the end of shit
-	moreRegex=re.compile(r'MORE:');
-	mo=moreRegex.search(output);
-
-	return output
-
-
-#Initialise Tweepy
-try:
-	tweetStuff=tw.tweepy_init();
-	api = tw.get_api(tweetStuff);
-except Exception as ex:
-	print(ex);
-	sys.exit(1);
-#Set Parameters
-=======
 # --------------------------------------
 def build_word(e, d, d0):
     r.seed(dt.datetime.now())
@@ -130,7 +73,6 @@ def build_word(e, d, d0):
 
     return output
 
->>>>>>> b6a05194a06f1433c5f6decabde5910098fa8f63
 
 try:
     # Initialise Tweepy
