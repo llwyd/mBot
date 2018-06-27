@@ -68,7 +68,9 @@ def build_word(e, d, d0):
             except:
                 break
 
-    if not re.compile("[.?!]$").match(output):
+    # This regex doesnt work.
+    #if not re.compile("[.?!]$").match(output):
+    if (output[-1] != '.') and (output[-1] != '?') and (output[-1] != '!'):
         output += "."
 
     return output
