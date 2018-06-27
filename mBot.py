@@ -11,8 +11,8 @@ import tweepy
 import traceback
 import settings
 import twitter as tw
-
-
+from collections import Counter
+from tqdm import tqdm
 #
 #
 #
@@ -173,7 +173,7 @@ if not rateLimit:
 
 # Remove textless image only tweets;
 purgeList = []
-for i in range(len(s)):
+for i in tqdm(range(len(s))):
     if s[i][0:5] == "https":
         purgeList.append(i)
 for i in range(len(purgeList) - 1, -1, -1):
@@ -221,7 +221,8 @@ for i in range(len(purgeList) - 1, -1, -1):
 # --------------------------------------
 #   begin filtering of firstWords
 # --------------------------------------
-for i in range(len(t)):
+print("Building array of n[0]...")
+for i in tqdm(range(len(t))):
     dup = False
     for j in range(len(e)):
         if t[i][0] == e[j]:
@@ -234,12 +235,15 @@ for i in range(len(t)):
 #   Filter second words
 # --------------------------------------
 # check if the first word already exists in the dictionary
-for i in range(len(e)):
+print("Building array of n[1]...")
+print("	Check if word already exists...")
+for i in tqdm(range(len(e))):
     if not (e[i] in d):
         d[e[i]] = []
 
 # Create dictionary of first words and second words
-for i in range(len(t)):
+print("	Building array of n[0] and n[1]...")
+for i in tqdm(range(len(t))):
     dup = False
     # print(i);
     for j in range(len(d[t[i][0]])):
@@ -252,8 +256,10 @@ for i in range(len(t)):
 # --------------------------------------
 #   Other Words
 # --------------------------------------
+print("Building array of n[1:k]...")
 # check if word already exists
-for i in range(len(t)):
+print("	Check if word already exists...")
+for i in tqdm(range(len(t))):
     if t[i] is None:
         continue
     for p in range(1, len(t[i])):
@@ -261,7 +267,8 @@ for i in range(len(t)):
             d0[t[i][p]] = []
 
 # add new words to database
-for i in range(len(t)):
+print("	Add new words to database...")
+for i in tqdm(range(len(t))):
     if t[i] is None:
         continue
     for j in range(2, len(t[i])):
@@ -273,6 +280,26 @@ for i in range(len(t)):
         if not dup:
             d0[t[i][j - 1]].append(t[i][j])
 
+#Some minor stats
+print("----------------------------------------")
+print("	Basic stats...")
+print("Number of starting words: "+str(len(e)));
+maxKeys=0
+maxKeyLoc=0
+for i in tqdm(range(len(e))):
+	currentLength=len(d[e[i]]);
+	if(currentLength>maxKeys):
+		maxKeys=currentLength
+		maxKeyLoc=i
+print("The word '"+e[maxKeyLoc]+"' has the most following words ("+str(maxKeys)+") entries")
+masterWordList=[];
+for i in tqdm(range(len(t))):
+	masterWordList=masterWordList+t[i];
+mostCommonWords=Counter(masterWordList).most_common(10)
+print("The most common words are: ")
+for i in range(len(mostCommonWords)):
+	print("	"+str(mostCommonWords[i]))
+print("----------------------------------------")
 output = build_word(e, d, d0)
 while len(output) > 140:
     output = build_word(e, d, d0)
