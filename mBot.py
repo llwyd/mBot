@@ -280,26 +280,6 @@ for i in tqdm(range(len(t))):
         if not dup:
             d0[t[i][j - 1]].append(t[i][j])
 
-#Some minor stats
-print("----------------------------------------")
-print("	Basic stats...")
-print("Number of starting words: "+str(len(e)));
-maxKeys=0
-maxKeyLoc=0
-for i in tqdm(range(len(e))):
-	currentLength=len(d[e[i]]);
-	if(currentLength>maxKeys):
-		maxKeys=currentLength
-		maxKeyLoc=i
-print("The word '"+e[maxKeyLoc]+"' has the most following words ("+str(maxKeys)+") entries")
-masterWordList=[];
-for i in tqdm(range(len(t))):
-	masterWordList=masterWordList+t[i];
-mostCommonWords=Counter(masterWordList).most_common(10)
-print("The most common words are: ")
-for i in range(len(mostCommonWords)):
-	print("	"+str(mostCommonWords[i]))
-print("----------------------------------------")
 output = build_word(e, d, d0)
 while len(output) > 140:
     output = build_word(e, d, d0)
