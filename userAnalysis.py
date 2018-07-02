@@ -35,9 +35,18 @@ try:
     tweetStuff = tw.tweepy_init()
     api = tw.get_api(tweetStuff) 
     #Get descriptions
+    count={}
+    users.sort();
+    for i in range(len(users)):
+        count[users[i]]=users.count(users[i])
+    del users
+    users=list(count.keys());
+    users.sort();
     desc=[]
     for i in tqdm(range(len(users))):
     	desc.append(api.get_user(users[i]).description)
+    # Fancy regex here to harvest and count party affilication, then compare with user tweet count
+
 except Exception:
     traceback.print_exc()
     sys.exit(1)
