@@ -11,3 +11,5 @@ sparecode.py
 *.npy
 venv/
 *.pkl
+dataAnalysis.json
+
