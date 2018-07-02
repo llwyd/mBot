@@ -135,6 +135,22 @@ try:
     # Put current keys into callable list
     keys = list(latestTweets.keys())
 
+	#Harvest profile info
+    if os.path.isfile("users.pkl"):
+        print("Loading user database...")
+        with open("users.pkl", "rb") as fp:
+            users = pickle.load(fp)
+    else:
+        print("User database not found, creating new...")
+        users = []
+    for i in range(len(tweets)):
+        users.append(tweets[i].user.id);
+
+    print("Storing database...")
+    with open("users.pkl", "wb") as fp:
+        pickle.dump(users, fp)
+
+
     # begin filtering
 
     # collect list to purge

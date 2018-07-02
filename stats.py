@@ -13,6 +13,7 @@ import settings
 import twitter as tw
 from collections import Counter
 from tqdm import tqdm
+import nltk
 #
 #
 #
@@ -153,7 +154,7 @@ for i in tqdm(range(len(t))):
 #Some minor stats
 print("----------------------------------------")
 print("	Basic stats...")
-countNumber=10
+countNumber=100
 hashRegex=re.compile(r'#');
 hashTags=[]
 for i in range(len(t)):
