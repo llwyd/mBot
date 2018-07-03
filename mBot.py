@@ -112,98 +112,95 @@ except Exception:
 
 rateLimit = False
 
-try:
-    if os.path.isfile("misc.json"):
-        with open('misc.json') as data_file:
-            pos = json.load(data_file)
-    else:
-        pos = {'id': 0}
-    # get tweets
-    if pos['id'] == 0:
-        tweets = api.home_timeline(count=numTweet, tweet_mode='extended')
-    else:
-        tweets = api.home_timeline(count=numTweet, tweet_mode='extended', since_id=pos['id'])
+#try:
+#     if os.path.isfile("misc.json"):
+#         with open('misc.json') as data_file:
+#             pos = json.load(data_file)
+#     else:
+#         pos = {'id': 0}
+#     # get tweets
+#     if pos['id'] == 0:
+#         tweets = api.home_timeline(count=numTweet, tweet_mode='extended')
+#     else:
+#         tweets = api.home_timeline(count=numTweet, tweet_mode='extended', since_id=pos['id'])
 
-    # filter text and sort by ids
-    latestTweets = {}
-    for x in tweets:
-        latestTweets[x.id] = x.full_text
+#     # filter text and sort by ids
+#     latestTweets = {}
+#     for x in tweets:
+#         latestTweets[x.id] = x.full_text
 
-    # re-sort the tweets such that the newest appears first in the dict
-    latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
+#     # re-sort the tweets such that the newest appears first in the dict
+#     latestTweets = collections.OrderedDict(sorted(latestTweets.items(), reverse=True))
 
-    # Put current keys into callable list
-    keys = list(latestTweets.keys())
+#     # Put current keys into callable list
+#     keys = list(latestTweets.keys())
 
-	#Harvest profile info
-    if os.path.isfile("users.pkl"):
-        print("Loading user database...")
-        with open("users.pkl", "rb") as fp:
-            users = pickle.load(fp)
-    else:
-        print("User database not found, creating new...")
-        users = []
-    for i in range(len(tweets)):
-        users.append(tweets[i].user.id);
+# 	#Harvest profile info
+#     if os.path.isfile("users.pkl"):
+#         print("Loading user database...")
+#         with open("users.pkl", "rb") as fp:
+#             users = pickle.load(fp)
+#     else:
+#         print("User database not found, creating new...")
+#         users = []
+#     for i in range(len(tweets)):
+#         users.append(tweets[i].user.id);
 
-    print("Storing database...")
-    with open("users.pkl", "wb") as fp:
-        pickle.dump(users, fp)
+#     print("Storing database...")
+#     with open("users.pkl", "wb") as fp:
+#         pickle.dump(users, fp)
 
 
-    # begin filtering
+#     # begin filtering
 
-    # collect list to purge
-    purgeList = []
+#     # collect list to purge
+#     purgeList = []
 
-    for i in range(len(keys)):
-        # Filter Retweets
-        if latestTweets[keys[i]][0:2] == "RT":
-            purgeList.append(i)
+#     for i in range(len(keys)):
+#         # Filter Retweets
+#         if latestTweets[keys[i]][0:2] == "RT":
+#             purgeList.append(i)
 
-        # Filter direct Messages
-        elif latestTweets[keys[i]][0] == '@':
-            purgeList.append(i)
+#         # Filter direct Messages
+#         elif latestTweets[keys[i]][0] == '@':
+#             purgeList.append(i)
 
-    # purge list
-    for i in range(len(purgeList)):
-        latestTweets.pop(keys[purgeList[i]])
-    keys = list(latestTweets.keys())
+#     # purge list
+#     for i in range(len(purgeList)):
+#         latestTweets.pop(keys[purgeList[i]])
+#     keys = list(latestTweets.keys())
 
-    # Master list of tweets
-    new = list(latestTweets.values())
-except:
-    rateLimit = True
-    print("Rate limit exceeded, proceeding anyway")
+#     # Master list of tweets
+#     new = list(latestTweets.values())
+# except:
+#     rateLimit = True
+#     print("Rate limit exceeded, proceeding anyway")
 
 if os.path.isfile("database.pkl"):
     print("Loading tweet database...")
     with open("database.pkl", "rb") as fp:
         s = pickle.load(fp)
 else:
-    print("Database not found, creating new...")
-    s = []
-if not rateLimit:
-    for i in range(len(new)):
-        s.append(new[i])
+    print("Database not found, quitting...")
+    sys.exit()
 
-# Remove textless image only tweets;
-purgeList = []
-for i in tqdm(range(len(s))):
-    if s[i][0:5] == "https":
-        purgeList.append(i)
-for i in range(len(purgeList) - 1, -1, -1):
-    s.pop(purgeList[i])
+# # Remove textless image only tweets;
+# purgeList = []
+# for i in tqdm(range(len(s))):
+#     if s[i][0:5] == "https":
+#         purgeList.append(i)
+# for i in range(len(purgeList) - 1, -1, -1):
+#     s.pop(purgeList[i])
 
-# punctuation filter
-if punc:
-    print("Punctuation Filtering...")
-    for i in range(len(s)):
-        s[i] = s[i].translate(puncFilter)
+# # punctuation filter
+# if punc:
+#     print("Punctuation Filtering...")
+#     for i in range(len(s)):
+#         s[i] = s[i].translate(puncFilter)
 
-# Replace &
-for i in range(len(s)):
-    s[i] = s[i].replace("amp;", "and")
+# # Replace &
+# for i in range(len(s)):
+#     s[i] = s[i].replace("amp;", "and")
 
 # Split array of words
 for i in range(len(s)):
@@ -305,10 +302,10 @@ debugPost = input("Would you like to post this?(y/n)")
 if debugPost == 'y':
     post_tweet(output, tweetStuff)
 
-print("Storing database...")
-with open("database.pkl", "wb") as fp:
-    pickle.dump(s, fp)
+# print("Storing database...")
+# with open("database.pkl", "wb") as fp:
+#     pickle.dump(s, fp)
 
-print("Tweet database entries: " + str(len(s)) + " tweets")
-dataSize = os.stat('database.pkl').st_size
-print("Database size: " + str(dataSize) + "Bytes")
+# print("Tweet database entries: " + str(len(s)) + " tweets")
+# dataSize = os.stat('database.pkl').st_size
+# print("Database size: " + str(dataSize) + "Bytes")
