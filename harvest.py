@@ -65,6 +65,7 @@ try:
     else:
         pos = {'id': 0}
     # get tweets
+    print(pos['id']);
     if pos['id'] == 0:
         print("pos=0")
         tweets = api.home_timeline(count=numTweet, tweet_mode='extended')
@@ -72,10 +73,13 @@ try:
         print("pos!=0")
         tweets = api.home_timeline(count=numTweet, tweet_mode='extended', since_id=pos['id'])
 
-    pos['id']=tweets.max_id
-    with open('misc.json','w') as data_file:
-        json.dump(pos,data_file)    
-
+    if(tweets.since_id is not None):
+        pos['id']=tweets.since_id
+        with open('misc.json','w') as data_file:
+            json.dump(pos,data_file)    
+        print(pos['id']);
+    else:
+    	print("No new tweets!")
     # filter text and sort by ids
     latestTweets = {}
     for x in tweets:
