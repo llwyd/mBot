@@ -12,4 +12,4 @@ sparecode.py
 venv/
 *.pkl
 dataAnalysis.json
-
+misc.json

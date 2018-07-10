@@ -66,9 +66,15 @@ try:
         pos = {'id': 0}
     # get tweets
     if pos['id'] == 0:
+        print("pos=0")
         tweets = api.home_timeline(count=numTweet, tweet_mode='extended')
     else:
+        print("pos!=0")
         tweets = api.home_timeline(count=numTweet, tweet_mode='extended', since_id=pos['id'])
+
+    pos['id']=tweets.max_id
+    with open('misc.json','w') as data_file:
+        json.dump(pos,data_file)    
 
     # filter text and sort by ids
     latestTweets = {}
