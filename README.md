@@ -20,14 +20,14 @@ A terrible markov chain engine for generating tweets
 
 ### Generating Tweets
 
-1. Randomly select `word[0]`.
+* Randomly select `word[0]`.
 
   - Known as the ‘key’
   - Key is chosen at random to start the chain
 
-2. Randomly select `word[1]` based on `word[0]`.
+* Randomly select `word[1]` based on `word[0]`.
 
-3. Randomly select `word[x]` until:
+* Randomly select `word[x]` until:
 
   - `word[x]` has no `word[x+1]`.
     - Typically a word with a full stop.
