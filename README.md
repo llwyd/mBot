@@ -33,3 +33,7 @@ A terrible markov chain engine for generating tweets
     - Typically a word with a full stop.
 
 ## Further Reading/References
+
+* [1] zirak (2013) http://blog.javascriptroom.com/2013/01/21/markov-chains/
+
+* [2] Vivin Paliath (2010) https://stackoverflow.com/questions/4081662/explain-markov-chain-algorithm-in-laymans-terms
